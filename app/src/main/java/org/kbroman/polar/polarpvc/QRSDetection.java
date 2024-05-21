@@ -154,9 +154,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
                     }
                 } // End of search
 
-                if(minPeakIndex - mPeakIndex >= PVC_RS_DIST) {
-                    Toast.makeText(mActivity, "PVC", Toast.LENGTH_SHORT).show();
-                }
 
                 // Check if there is a close one in the previous interval
                 if (mPeakIndices.size() > 0) {
@@ -176,16 +173,30 @@ public class QRSDetection implements IConstants, IQRSConstants {
                         // Is not near a previous one, add it
                         mPeakIndices.add(mPeakIndex);
                         mRSdiff.add(minPeakIndex - mPeakIndex);
-                        if(minPeakIndex - mPeakIndex >= PVC_RS_DIST) qrsPlotter().addPVCValue(mPeakIndex, maxEcg);
-                        qrsPlotter().addPeakValue(mPeakIndex,
-                                maxEcg);
+                        if(minPeakIndex - mPeakIndex >= PVC_RS_DIST) {
+                            qrsPlotter().addPVCValue(mPeakIndex, maxEcg);
+                            mActivity.PVCdata.add(1.0);
+
+                            //                            Toast.makeText(mActivity, "PVC " + Math.round(mActivity.PVCdata.sum()) +
+                            //                                           " / " + mActivity.PVCdata.size(), Toast.LENGTH_SHORT).show();
+
+                        } else { mActivity.PVCdata.add(0.0); }
+                        qrsPlotter().addPeakValue(mPeakIndex, maxEcg);
                     }
                 } else {
                     // First peak
                     mPeakIndices.add(mPeakIndex);
                     mRSdiff.add(minPeakIndex - mPeakIndex);
-                    if(minPeakIndex - mPeakIndex >= PVC_RS_DIST) qrsPlotter().addPVCValue(mPeakIndex, maxEcg);
+                    if(minPeakIndex - mPeakIndex >= PVC_RS_DIST) {
+                        qrsPlotter().addPVCValue(mPeakIndex, maxEcg);
+                        mActivity.PVCdata.add(1.0);
+
+                        //                        Toast.makeText(mActivity, "PVC " + Math.round(mActivity.PVCdata.sum()) +
+                        //                                       " / " + mActivity.PVCdata.size(), Toast.LENGTH_SHORT).show();
+
+                    } else { mActivity.PVCdata.add(0.0); }
                     qrsPlotter().addPeakValue(mPeakIndex, maxEcg);
+
                 }
 
                 // Do HR/RR plot

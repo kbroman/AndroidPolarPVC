@@ -91,6 +91,8 @@ public class ECGActivity extends AppCompatActivity
     public HRPlotter mHRPlotter;
     public QRSPlotter mQRSPlotter;
 
+    public RunningAverage PVCdata = new RunningAverage(100);
+
     public boolean mOrientationChangedECG = false;
     public boolean mOrientationChangedQRS = false;
     public boolean mOrientationChangedHR = false;
@@ -1609,7 +1611,7 @@ public class ECGActivity extends AppCompatActivity
                                                @NonNull PolarHrData polarHrData) {
                 if (mPlaying) {
                     mTextViewHR.setText(String.valueOf(polarHrData.hr));
-                    mTextViewPVC.setText(String.valueOf(polarHrData.hr) + "%"); // put PVC value here
+                    mTextViewPVC.setText(String.valueOf(Math.round(PVCdata.average()*100.0)) + "%"); // put PVC value here
                     // Add to HR plot
                     long time = new Date().getTime();
                     mHRPlotter.addValues1(time, polarHrData.hr,
