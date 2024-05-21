@@ -90,12 +90,13 @@ public class QRSPlotter implements IConstants, IQRSConstants {
 
         mFormatter5 = new LineAndPointFormatter(null, Color.rgb(0x01, 0xFF, 0x70), null, null); // lime green color
         mFormatter5.setLegendIconEnabled(false);
+//        ((LineAndPointFormatter)mFormatter5).getVertexPaint().setStrokeWidth(20);
         mSeries5 = new SimpleXYSeries("PVC");
 
-        mPlot.addSeries(mSeries2, mFormatter2);
-        mPlot.addSeries(mSeries3, mFormatter3);
-        mPlot.addSeries(mSeries4, mFormatter4);
+        //        mPlot.addSeries(mSeries2, mFormatter2);
+        //        mPlot.addSeries(mSeries3, mFormatter3);
         mPlot.addSeries(mSeries1, mFormatter1);
+        mPlot.addSeries(mSeries4, mFormatter4);
         mPlot.addSeries(mSeries5, mFormatter5);
         setupPlot();
     }
@@ -188,8 +189,8 @@ public class QRSPlotter implements IConstants, IQRSConstants {
 
         try {
             newPlotter.mPlot.addSeries(mSeries1, mFormatter1);
-            newPlotter.mPlot.addSeries(mSeries2, mFormatter2);
-            newPlotter.mPlot.addSeries(mSeries3, mFormatter3);
+            //            newPlotter.mPlot.addSeries(mSeries2, mFormatter2);
+            //            newPlotter.mPlot.addSeries(mSeries3, mFormatter3);
             newPlotter.mPlot.addSeries(mSeries4, mFormatter4);
             newPlotter.mPlot.addSeries(mSeries5, mFormatter5);
             newPlotter.setupPlot();
