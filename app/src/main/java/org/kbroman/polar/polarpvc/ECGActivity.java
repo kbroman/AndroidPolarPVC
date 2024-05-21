@@ -109,7 +109,7 @@ public class ECGActivity extends AppCompatActivity
      */
     private enum SaveType {DATA, PLOT, BOTH, DEVICE_HR, QRS_HR, ALL}
 
-    TextView mTextViewHR, mTextViewInfo, mTextViewTime, mTextViewPVC, mTextViewPVCdebug;
+    TextView mTextViewHR, mTextViewInfo, mTextViewTime, mTextViewPVC;
     private PolarBleApi mApi;
     private Disposable mEcgDisposable;
     private boolean mPlaying;
@@ -246,7 +246,6 @@ public class ECGActivity extends AppCompatActivity
         setContentView(R.layout.activity_ecg);
         mTextViewHR = findViewById(R.id.hr);
         mTextViewPVC = findViewById(R.id.pvc);
-        mTextViewPVCdebug = findViewById(R.id.pvc_debug);
         mTextViewInfo = findViewById(R.id.info);
         mTextViewTime = findViewById(R.id.time);
         mECGPlot = findViewById(R.id.ecgplot);
@@ -1443,7 +1442,6 @@ public class ECGActivity extends AppCompatActivity
 
         TextView hrOld = mTextViewHR;
         TextView pvcOld = mTextViewPVC;
-        TextView pvcdebugOld = mTextViewPVCdebug;
         TextView timeOld = mTextViewTime;
         TextView infoOld = mTextViewInfo;
 
@@ -1461,7 +1459,6 @@ public class ECGActivity extends AppCompatActivity
         mHRPlot = findViewById(R.id.hrplot);
         mTextViewHR = findViewById(R.id.hr);
         mTextViewPVC = findViewById(R.id.pvc);
-        mTextViewPVCdebug = findViewById(R.id.pvc_debug);
         mTextViewTime = findViewById(R.id.time);
         mTextViewInfo = findViewById(R.id.info);
 
@@ -1470,7 +1467,6 @@ public class ECGActivity extends AppCompatActivity
         mECGPlot.post(() -> {
             mTextViewHR.setText(hrOld.getText());
             mTextViewPVC.setText(pvcOld.getText());
-            mTextViewPVCdebug.setText(pvcdebugOld.getText());
             mTextViewTime.setText(timeOld.getText());
             mTextViewInfo.setText(infoOld.getText());
 //            Log.d(TAG, "mECGPlot.post (before): time="
@@ -1553,7 +1549,6 @@ public class ECGActivity extends AppCompatActivity
         if (mHRPlotter != null) mHRPlotter.clear();
         mTextViewHR.setText("");
         mTextViewPVC.setText("");
-        mTextViewPVCdebug.setText("");
         mTextViewTime.setText("");
         mTextViewInfo.setText("");
         invalidateOptionsMenu();
@@ -1669,7 +1664,6 @@ public class ECGActivity extends AppCompatActivity
 //                            mPlaying);
                     mTextViewHR.setText(String.valueOf(polarHrData.hr));
                     mTextViewPVC.setText(String.valueOf(polarHrData.hr) + "%"); // put PVC value here
-                    mTextViewPVCdebug.setText("hello"); // use this for debug info
                     // Add to HR plot
                     long time = new Date().getTime();
                     mHRPlotter.addValues1(time, polarHrData.hr,
