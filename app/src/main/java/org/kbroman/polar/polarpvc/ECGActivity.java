@@ -265,14 +265,6 @@ public class ECGActivity extends AppCompatActivity
         setLastHr();
         mStopTime = new Date();
 
-//        // DEBUG
-//        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-//        Log.d(TAG, "All settings (getPreferences(MODE_PRIVATE)):\n"
-//                + Utils.getSharedPreferencesInfo("    ", prefs));
-//        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        Log.d(TAG, "All settings (getDefaultSharedPreferences):\n"
-//                + Utils.getSharedPreferencesInfo("    ", prefs));
-
         // Start Bluetooth
         mDeviceId = mSharedPreferences.getString(PREF_DEVICE_ID, "");
         Log.d(TAG, "    mDeviceId=" + mDeviceId);
@@ -332,9 +324,6 @@ public class ECGActivity extends AppCompatActivity
         invalidateOptionsMenu();
 
         // Setup the plots if not done
-//        Log.d(TAG,
-//                "    mECGPlotter=" + mECGPlotter + " mHRPlotter=" + mHRPlotter
-//                        + " mQRSPlotter=" + mQRSPlotter);
         if (mECGPlotter == null) {
             mECGPlot.post(() -> mECGPlotter =
                     new ECGPlotter(this, mECGPlot,
@@ -369,7 +358,6 @@ public class ECGActivity extends AppCompatActivity
         } else {
             restart();
         }
-//        Log.d(TAG, "    onResume(end) mPlaying=" + mPlaying);
     }
 
     @Override
@@ -383,8 +371,6 @@ public class ECGActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        Log.d(TAG, this.getClass().getSimpleName() + " onCreateOptionsMenu");
-//        Log.d(TAG, "    mPlaying=" + mPlaying);
         mMenu = menu;
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_menu, menu);
@@ -1089,8 +1075,6 @@ public class ECGActivity extends AppCompatActivity
         int indx;
         for (int j = 0; j < peakslen; j++) {
             indx = peakxvals.get(j).intValue() + offset;
-//            Log.d(TAG, String.format("j=%d indx=%d xval=%d",
-//                    j, indx, peakxvals.get(j).intValue()));
             peaks[indx] = true;
         }
         arrays = new PlotArrays(ecg, peaks);
@@ -1469,52 +1453,21 @@ public class ECGActivity extends AppCompatActivity
             mTextViewPVC.setText(pvcOld.getText());
             mTextViewTime.setText(timeOld.getText());
             mTextViewInfo.setText(infoOld.getText());
-//            Log.d(TAG, "mECGPlot.post (before): time="
-//                    + sdfShort.format(new Date())
-//                    + " plotter=" + Utils.getHashCode(mECGPlotter)
-//                    + " plot=" + Utils.getHashCode(mECGPlot)
-//                    + " isLaidOut=" + mECGPlot.isLaidOut()
-//            );
+
             mECGPlotter = mECGPlotter.getNewInstance(mECGPlot);
             mECGPlotter.setPanning(!mPlaying);
             mOrientationChangedECG = false;
-//            Log.d(TAG, "mECGPlot.post (after): time="
-//                    + sdfShort.format(new Date())
-//                    + " plotter=" + Utils.getHashCode(mECGPlotter)
-//                    + " plot=" + Utils.getHashCode(mECGPlot)
         });
 
         // Layout analysis
         mQRSPlot.post(() -> {
-//            Log.d(TAG, "mQRSPlot.post (before): time="
-//                    + sdfShort.format(new Date())
-//                    + " plotter=" + Utils.getHashCode(mQRSPlotter)
-//                    + " plot=" + Utils.getHashCode(mQRSPlot)
-//                    + " isLaidOut=" + mQRSPlot.isLaidOut()
-//            );
             mQRSPlotter = mQRSPlotter.getNewInstance(mQRSPlot);
             mQRSPlotter.setPanning(!mPlaying);
             mOrientationChangedQRS = false;
-//            Log.d(TAG, "mQRSPlot.post (after): time="
-//                    + sdfShort.format(new Date())
-//                    + " plotter=" + Utils.getHashCode(mQRSPlotter)
-//                    + " plot=" + Utils.getHashCode(mQRSPlot)
-//            );
         });
         mHRPlot.post(() -> {
-//            Log.d(TAG, "mHRPlot.post (before): time="
-//                    + sdfShort.format(new Date())
-//                    + " plotter=" + Utils.getHashCode(mHRPlotter)
-//                    + " plot=" + Utils.getHashCode(mHRPlot)
-//                    + " isLaidOut=" + mHRPlot.isLaidOut()
-//            );
             mHRPlotter = mHRPlotter.getNewInstance(mHRPlot);
             mOrientationChangedHR = false;
-//            Log.d(TAG, "mHRPlot.post (after): time="
-//                    + sdfShort.format(new Date())
-//                    + " plotter=" + Utils.getHashCode(mHRPlotter)
-//                    + " plot=" + Utils.getHashCode(mHRPlot)
-//            );
         });
     }
 
@@ -1576,16 +1529,12 @@ public class ECGActivity extends AppCompatActivity
         // Post a Runnable to have plots to be setup again in 1 sec
         final Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(() -> {
-//            Log.d(TAG,
-//                    "No connection handler: time=" + sdfShort.format(new
-//                    Date()));
             if (!mConnected) {
                 Utils.warnMsg(ECGActivity.this, "No connection to " + mDeviceId
                         + " after 1 minute");
             }
         }, 60000);
         // Allow logging from the SDK
-//        mApi.setApiLogger(msg -> Log.d("PolarAPI", msg));
         mApi.setApiCallback(new PolarBleApiCallback() {
             @Override
             public void blePowerStateChanged(boolean b) {
@@ -1659,9 +1608,6 @@ public class ECGActivity extends AppCompatActivity
             public void hrNotificationReceived(@NonNull String s,
                                                @NonNull PolarHrData polarHrData) {
                 if (mPlaying) {
-//                    Log.d(TAG,
-//                            "*HR " + polarHrData.hr + " mPlaying=" +
-//                            mPlaying);
                     mTextViewHR.setText(String.valueOf(polarHrData.hr));
                     mTextViewPVC.setText(String.valueOf(polarHrData.hr) + "%"); // put PVC value here
                     // Add to HR plot
@@ -1687,7 +1633,6 @@ public class ECGActivity extends AppCompatActivity
             mStopTime = new Date();
         }
         invalidateOptionsMenu();
-//        Log.d(TAG, "    restart(end) mApi=" + mApi + " mPlaying=" + mPlaying);
     }
 
     /**

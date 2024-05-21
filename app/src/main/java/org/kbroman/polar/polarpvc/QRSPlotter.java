@@ -146,10 +146,6 @@ public class QRSPlotter implements IConstants, IQRSConstants {
 //        // Allow panning
 //        PanZoom.attach(mPlot, PanZoom.Pan.HORIZONTAL, PanZoom.Zoom.NONE);
 
-//        // DEBUG
-//        Log.d(TAG, this.getClass().getSimpleName()
-//                + " setupPlot: Before update\n" + getLogInfo(rMax));
-
             // Update the plot
             update();
         } catch (Exception ex) {
@@ -395,10 +391,6 @@ public class QRSPlotter implements IConstants, IQRSConstants {
      * @param val3 Value for the third series. Score
      */
     public void addValues(Number val1, Number val2, Number val3) {
-//        Log.d(TAG, this.getClass().getSimpleName()
-//                + "addValues: dataIndex=" + mDataIndex + " mSeriesSize="
-//                + mSeries1.size() + " mSeries2Size=" + mSeries2.size()
-//                + " val1=" + val1 + " val2=" + val2);
         // Add the new values, removing old values if needed
         // Convert from  μV to mV
         if (val1 != null) {
@@ -429,32 +421,16 @@ public class QRSPlotter implements IConstants, IQRSConstants {
     }
 
     public void addPeakValue(int sample, double ecg) {
-//        Log.d(TAG, this.getClass().getSimpleName()
-//                + "addPeakValue: dataIndex=" + mDataIndex + " mSeriesSize="
-//                + mSeries4.size()
-//                + " sample=" + sample + " ecg=" + ecg);
-//
         // Remove old values if needed
         removeOutOfRangeValues();
         mSeries4.addLast(sample, ecg);
-//        Log.d(TAG, "Added peak value: sample=" + sample + " size=" +
-//        mSeries4.size()
-//                + " ecg=" + ecg + " mDataIndex=" + mDataIndex);
     }
 
     public void replaceLastPeakValue(int sample, double ecg) {
-//        Log.d(TAG, this.getClass().getSimpleName()
-//                + "addPeakValue: dataIndex=" + mDataIndex + " mSeriesSize="
-//                + mSeries4.size()
-//                + " sample=" + sample + " ecg=" + ecg);
-//
         // Remove old values if needed
         removeOutOfRangeValues();
         mSeries4.removeLast();
         mSeries4.addLast(sample, ecg);
-//            Log.d(TAG, "Replaced peak value: sample=" + sample + " size=" +
-//            mSeries4.size()
-//                    + " ecg=" + ecg + " mDataIndex=" + mDataIndex);
     }
 
     public void addPVCValue(int sample, double ecg) {
@@ -491,13 +467,6 @@ public class QRSPlotter implements IConstants, IQRSConstants {
         plotMin = mDataIndex - N_ECG_PLOT_POINTS;
         plotMax = mDataIndex;
         mPlot.setDomainBoundaries(plotMin, plotMax, BoundaryMode.FIXED);
-//        Log.d(TAG, this.getClass().getSimpleName() + "
-//        updateDomainBoundaries: "
-//                + "plotMin=" + plotMin + " plotmax=" + plotMax
-//                + " size=" + mSeries1.size());
-//        int colorInt = mPlot.getGraph().getGridBackgroundPaint().getColor();
-//        String hexColor = String.format("#%06X", (0xFFFFFF & colorInt));
-//        Log.d(TAG, "gridBgColor=" + hexColor);
     }
 
     /**
@@ -505,9 +474,6 @@ public class QRSPlotter implements IConstants, IQRSConstants {
      */
     public void update() {
         if (mPlot.getVisibility() == View.GONE) return;
-//            Log.d(TAG, this.getClass().getSimpleName()
-//                    + " update: thread: " + Thread.currentThread()
-//                    .getName());
         if (mDataIndex % 73 == 0) {
             mActivity.runOnUiThread(mPlot::redraw);
         }

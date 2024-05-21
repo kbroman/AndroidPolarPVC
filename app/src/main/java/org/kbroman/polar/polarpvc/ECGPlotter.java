@@ -69,9 +69,6 @@ public class ECGPlotter implements IConstants, IQRSConstants {
      * @return The new instance.
      */
     public ECGPlotter getNewInstance(XYPlot plot) {
-//        Log.d(TAG, this.getClass().getSimpleName() + " getNewInstance: "
-//                + " plot=" + Utils.getHashCode(plot)
-//                + " mPlot=" + Utils.getHashCode(mPlot));
 
         ECGPlotter newPlotter = new ECGPlotter(plot);
         newPlotter.mPlot = plot;
@@ -90,12 +87,6 @@ public class ECGPlotter implements IConstants, IQRSConstants {
      */
     public void setupPlot() {
         Log.d(TAG, this.getClass().getSimpleName() + " setupPlot");
-//        Log.d(TAG, "    thread: " + Thread.currentThread().getName()
-//                + " writeHoldCount=" + mLock.getWriteHoldCount()
-//                + " readHoldCount=" + mLock.getReadHoldCount()
-//                + " isWriteLockedByCurrentThread="
-//                + mLock.isWriteLockedByCurrentThread()
-//        );
         try {
             // Calculate the range limits to make the blocks be square.
             // A large box is .5 mV. rMax corresponds to half the total
@@ -111,14 +102,6 @@ public class ECGPlotter implements IConstants, IQRSConstants {
                 rMax = .25 * N_DOMAIN_LARGE_BOXES * gridRect.height()
                         / gridRect.width();
             }
-
-//        // DEBUG
-//        mPlot.getGraph().setLineLabelEdges(XYGraphWidget.Edge.LEFT);
-//        mPlot.getGraph().getLineLabelInsets().setLeft(PixelUtils.dpToPix(0));
-//        mPlot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).getPaint()
-//                .setColor(Color.RED);
-//        mPlot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).getPaint()
-//                .setTextSize(PixelUtils.dpToPix(10f));
 
             // Range
             // Set the range block to be .1 mV so a large block will be .5 mV
@@ -143,9 +126,6 @@ public class ECGPlotter implements IConstants, IQRSConstants {
 //        // Allow panning
 //        PanZoom.attach(mPlot, PanZoom.Pan.HORIZONTAL, PanZoom.Zoom.NONE);
 
-//            // DEBUG
-//            Log.d(TAG, this.getClass().getSimpleName()
-//                    + " setupPlot: Before update\n" + getLogInfo(rMax));
 
             // Update the plot
             update();
@@ -338,9 +318,6 @@ public class ECGPlotter implements IConstants, IQRSConstants {
      * @param polarEcgData The data that came in.
      */
     public void addValues(PolarEcgData polarEcgData) {
-//        Log.d(TAG,
-//                "addValues: dataIndex=" + dataIndex + " seriesSize=" +
-//                series.size());
         int nSamples = polarEcgData.samples.size();
         if (nSamples == 0) return;
 
@@ -349,11 +326,6 @@ public class ECGPlotter implements IConstants, IQRSConstants {
             if (mSeries.size() >= N_TOTAL_POINTS) {
                 mSeries.removeFirst();
             }
-//            // DEBUG Generate test values +- 1 mV
-//            double testVal = 0.0;
-//            if ((mDataIndex % 25) == 0) testVal = -1.0;
-//            if ((mDataIndex % 50) == 0) testVal = 1.0;
-//            mSeries.addLast(mDataIndex++, testVal);
 
             // Convert from  μV to mV and add to series
             mSeries.addLast(mDataIndex++, MICRO_TO_MILLI_VOLT * val);
@@ -368,35 +340,12 @@ public class ECGPlotter implements IConstants, IQRSConstants {
         plotMin = mDataIndex - N_ECG_PLOT_POINTS;
         plotMax = mDataIndex;
         mPlot.setDomainBoundaries(plotMin, plotMax, BoundaryMode.FIXED);
-//            Log.d(TAG, this.getClass().getSimpleName() + " updatePlot: "
-//                    + "plotMin=" + plotMin + " plotmax=" + plotMax
-//                    + " size=" + mSeries.size());
-//            int colorInt = mPlot.getGraph().getGridBackgroundPaint()
-//            .getColor();
-//            String hexColor = String.format("#%06X", (0xFFFFFF & colorInt));
-//            Log.d(TAG, "gridBgColor=" + hexColor);
     }
 
     /**
      * Updates the plot. Runs on the UI thread.
      */
     public void update() {
-//        Log.d(TAG, this.getClass().getSimpleName()
-//                + " update: thread: " + Thread.currentThread().getName()
-//                + " writeHoldCount=" + mLock.getWriteHoldCount()
-//                + " readHoldCount=" + mLock.getReadHoldCount()
-//                + " isWriteLockedByCurrentThread="
-//                + mLock.isWriteLockedByCurrentThread()
-//        );
-//        Log.d(TAG, "ECGPLot update: " + ECGActivity.sdfShort.format(new
-//        Date())
-//                + " mOrientationChangedECG=" + mActivity
-//                .mOrientationChangedECG
-//                + " height=" + mPlot.getHeight()
-//                + " isLaidOut=" + mPlot.isLaidOut()
-//                + " plotter=" + Utils.getHashCode(this)
-//                + " plot=" + Utils.getHashCode(mPlot)
-//        );
         mActivity.runOnUiThread(mPlot::redraw);
     }
 

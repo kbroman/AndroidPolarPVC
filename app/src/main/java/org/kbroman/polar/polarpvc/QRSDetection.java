@@ -73,8 +73,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
     }
 
     public void process(PolarEcgData polarEcgData) {
-//        Log.d(TAG, this.getClass().getSimpleName() + " process"
-//                + " thread=" + Thread.currentThread().getName());
         // Update the ECG plot
         ecgPlotter().addValues(polarEcgData);
 
@@ -137,12 +135,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
         if (i % HR_200_INTERVAL == 0) {
             // End of interval, process this interval
             if (i > 0 && mPeakIndex != -1) {
-//                Log.d(TAG, "doAlgorithm: " +
-//                        ".......... start processing interval i=" + i
-//                        + " mPeakIndex=" + mPeakIndex
-//                        + " mMinPeakIndex=" + mMinPeakIndex
-//                        + " mMaxPeakIndex=" + mMaxPeakIndex
-//                );
                 // There is an mPeakIndex != -1
                 // Look between mMinPeakIndex and mMaxPeakIndex for a the
                 // largest ecg value
@@ -151,10 +143,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
                 endSearch = Math.min(i, mMaxPeakIndex + SEARCH_EXTEND);
                 maxEcg = -Double.MAX_VALUE;
                 minEcg = +Double.MAX_VALUE;
-//                Log.d(TAG, "doAlgorithm: " +
-//                        ".......... start searching: startSearch="
-//                        + startSearch
-//                        + " endSearch=" + endSearch);
                 for (int i1 = startSearch; i1 < endSearch + 1; i1++) {
                     if (ecgVals.get(i1) > maxEcg) {
                         maxEcg = ecgVals.get(i1);
@@ -170,13 +158,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
                     Toast.makeText(mActivity, "PVC", Toast.LENGTH_SHORT).show();
                 }
 
-//                Log.d(TAG, "doAlgorithm: " +
-//                        ".......... end searching: startSearch="
-//                        + startSearch
-//                        + " endSearch=" + endSearch
-//                        + " mPeakIndex=" + mPeakIndex
-//                        + " maxEcg=" + maxEcg
-//                );
                 // Check if there is a close one in the previous interval
                 if (mPeakIndices.size() > 0) {
                     lastIndex = mPeakIndices.size() - 1; // last
@@ -190,10 +171,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
                             mRSdiff.setLast(minPeakIndex - mPeakIndex);
                             qrsPlotter().replaceLastPeakValue(mPeakIndex,
                                     maxEcg);
-//                            Log.d(TAG, "doAlgorithm: " +
-//                                    "replaceLastPeakValue:"
-//                                    + " mPeakIndex=" + mPeakIndex
-//                                    + ", maxEcg=" + maxEcg);
                         }
                     } else {
                         // Is not near a previous one, add it
@@ -202,10 +179,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
                         if(minPeakIndex - mPeakIndex >= PVC_RS_DIST) qrsPlotter().addPVCValue(mPeakIndex, maxEcg);
                         qrsPlotter().addPeakValue(mPeakIndex,
                                 maxEcg);
-//                        Log.d(TAG, "doAlgorithm: " +
-//                                "addPeakValue:"
-//                                + " mPeakIndex=" + mPeakIndex
-//                                + ", maxEcg=" + maxEcg);
                     }
                 } else {
                     // First peak
@@ -213,10 +186,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
                     mRSdiff.add(minPeakIndex - mPeakIndex);
                     if(minPeakIndex - mPeakIndex >= PVC_RS_DIST) qrsPlotter().addPVCValue(mPeakIndex, maxEcg);
                     qrsPlotter().addPeakValue(mPeakIndex, maxEcg);
-//                    Log.d(TAG, "doAlgorithm: " +
-//                            "addPeakValue:"
-//                            + " mPeakIndex=" + mPeakIndex
-//                            + ", maxEcg=" + maxEcg);
                 }
 
                 // Do HR/RR plot
@@ -243,8 +212,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
             mPeakIndex = -1;
             mMinPeakIndex = -1;
             mMaxPeakIndex = -1;
-//            Log.d(TAG, "doAlgorithm: " +
-//                    ".......... end processing interval i=" + i);
         } // End of end of process interval
 
         // Check for max ecg

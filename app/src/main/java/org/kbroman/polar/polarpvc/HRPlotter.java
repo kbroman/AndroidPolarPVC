@@ -213,20 +213,8 @@ public class HRPlotter implements IConstants, IQRSConstants {
 
     @SuppressWarnings("ConstantConditions")
     public void addValues1(double time, double hr, List<Integer> rrsMs) {
-//        Log.d(TAG, this.getClass().getSimpleName() + ": addHrValues: time="
-//                + mDateFormatSec.format(time) + " hr=" + hr + " hrSize=" +
-//                mHrSeries1.size());
         if (mPlotHr1 || mPlotRr1) {
             mHrRrList1.add(new HrRrSessionData(time, hr, rrsMs));
-//            StringBuilder sb = new StringBuilder();
-//            sb.append("HRPlotter: addValues1");
-//            sb.append(" time=");
-//            sb.append(X_AXIS_DATE_FORMAT.format(new Date(Math.round(time))));
-//            sb.append(" hr=").append(Math.round(hr)).append(" rr=");
-//            for (int rr : rrsMs) {
-//                sb.append(rr).append(" ");
-//            }
-//            Log.d(TAG, sb.toString());
             if (Double.isNaN(mStartTime)) mStartTime = time;
             if (Double.isNaN(mLastTime)) {
                 mLastTime = time;
@@ -259,10 +247,6 @@ public class HRPlotter implements IConstants, IQRSConstants {
                 mTotalRrTime = 0;
             }
             mTotalRrTime += totalRR;
-//        Log.d(TAG, "lastRrTime=" + mLastRrTime
-//                + " totalRR=" + totalRR
-//                + " elapsed=" + (mLastRrTime - mStartRrTime)
-//                + " totalRrTime=" + mTotalRrTime);
 
             double rr;
             double t = mLastRrTime;
@@ -299,16 +283,8 @@ public class HRPlotter implements IConstants, IQRSConstants {
 
     @SuppressWarnings("ConstantConditions")
     public void addValues2(double time, double hr, double rr) {
-//        Log.d(TAG, this.getClass().getSimpleName() + ": addValues2: time="
-//                + mDateFormatSec.format(time) + " hr=" + hr + " rr="
-//                + RR_SCALE * rr);
         if (mPlotHr2 || mPlotRr2) {
             mHrRrList2.add(new HrRrSessionData(time, hr, rr));
-//            Log.d(TAG, "HRPlotter: addValues2"
-//                    + " time=" + X_AXIS_DATE_FORMAT.format(new Date(Math
-//                    .round(time)))
-//                    + " hr=" + Math.round(hr)
-//                    + " rr=" + Math.round(rr));
             if (Double.isNaN(mStartTime)) mStartTime = time;
             if (Double.isNaN(mLastTime)) {
                 mLastTime = time;
@@ -386,22 +362,9 @@ public class HRPlotter implements IConstants, IQRSConstants {
         return sb.toString();
     }
 
-//    public String getRrInfo() {
-//        double elapsed = MS_TO_SEC * (mLastRrTime - mStartRrTime);
-//        double total = MS_TO_SEC * mTotalRrTime;
-//        double ratio = total / elapsed;
-//        return "Tot=" + String.format(Locale.US, "%.2f s", elapsed)
-//                + " RR=" + String.format(Locale.US, "%.2f s", total)
-//                + " (" + String.format(Locale.US, "%.2f", ratio) + ")";
-//    }
-
     public void updateDomainRangeBoundaries() {
         double max = Math.max(mRunningMax1.max(), mRunningMax2.max());
         if (Double.isNaN(max) || max < 60) max = 60;
-//        Log.d(TAG, this.getClass().getSimpleName() +
-//        "updateDomainRangeBoundaries: mStartTime="
-//                + mStartTime + " mlastTime=" + mLastTime
-//                + " max=" + max);
         if (!Double.isNaN(mLastTime) && !Double.isNaN(mStartTime)) {
             if (mLastTime - mStartTime > HR_PLOT_DOMAIN_INTERVAL) {
                 mPlot.setDomainBoundaries(mLastTime - HR_PLOT_DOMAIN_INTERVAL,
@@ -418,33 +381,13 @@ public class HRPlotter implements IConstants, IQRSConstants {
         }
         Number upperBoundary = Math.min(Math.ceil(max + 10), 200);
         mPlot.setRangeBoundaries(0, upperBoundary, BoundaryMode.FIXED);
-//        RectRegion rgn= mPlot.getOuterLimits();
-//        Log.d(TAG,"OuterLimits="  + rgn.getMinX() + "," + rgn.getMaxX());
-//        mPlot.getOuterLimits().set(mStartTime, mLastTime,
-//                0, Math.ceil(max + 10));
     }
 
-//    public void setOuterLimits() {
-//        mLock.writeLock().lock();
-//        try {
-//            if (!Double.isNaN(mLastTime) && Double.isNaN(mLastTime)) {
-//                mPlot.getOuterLimits().setMinX(mStartTime);
-//                mPlot.getOuterLimits().setMaxX(mLastTime);
-//            } else {
-//                mPlot.getOuterLimits().setMinX(0);
-//                mPlot.getOuterLimits().setMaxX(1);
-//            }
-//        } finally {
-//            mLock.writeLock().unlock();
-//        }
-//    }
 
     /**
      * Updates the plot. Runs on the UI thread.
      */
     public void update() {
-//        Log.d(TAG, "HRPlotter: update: dataList sizes=" + mHrRrList1.size()
-//                + "," + mHrRrList2.size());
         mActivity.runOnUiThread(mPlot::redraw);
     }
 
