@@ -64,22 +64,22 @@ public class QRSPlotter implements IConstants, IQRSConstants {
         this.mPlot = plot;
         this.mDataIndex = 0;
 
-        mFormatter1 = new LineAndPointFormatter(Color.rgb(0, 153, 255),
+        mFormatter1 = new LineAndPointFormatter(Color.rgb(0, 0x74, 0xD9), // blue color
                 null, null, null);
         mFormatter1.setLegendIconEnabled(false);
         mSeries1 = new SimpleXYSeries("ECG");
 
-        mFormatter2 = new LineAndPointFormatter(Color.rgb(255, 216, 0),
+        mFormatter2 = new LineAndPointFormatter(Color.rgb(0xFF, 0xDC, 0), // yellow color
                 null, null, null);
         mFormatter2.setLegendIconEnabled(false);
         mSeries2 = new SimpleXYSeries("Deriv");
 
-        mFormatter3 = new LineAndPointFormatter(Color.rgb(50, 205, 50),
+        mFormatter3 = new LineAndPointFormatter(Color.rgb(0x2E, 0xCC, 0x40), // green color
                 null, null, null); // Crimson
         mFormatter3.setLegendIconEnabled(false);
         mSeries3 = new SimpleXYSeries("Square");
 
-        mFormatter4 = new LineAndPointFormatter(null, Color.RED, null, null);
+        mFormatter4 = new LineAndPointFormatter(null, Color.rgb(0xFF, 0x41, 0x36), null, null); // red color
         mFormatter4.setLegendIconEnabled(false);
 //        ((LineAndPointFormatter)mFormatter4).getVertexPaint()
 //        .setStrokeWidth(20);

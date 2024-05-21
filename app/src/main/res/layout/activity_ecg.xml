@@ -48,7 +48,7 @@
             android:layout_marginStart="30dp"
             android:layout_marginTop="30dp"
             android:textAlignment="center"
-            android:textColor="#C00000"
+            android:textColor="@color/red"
             android:textSize="30sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -62,7 +62,7 @@
             android:layout_marginRight="30dp"
             android:layout_marginBottom="8dp"
             android:textAlignment="center"
-            android:textColor="#000000"
+            android:textColor="@color/black"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@id/hr"
             app:layout_constraintRight_toRightOf="parent"
@@ -75,7 +75,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
-            android:textColor="#000000"
+            android:textColor="@color/black"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent" />

@@ -82,26 +82,25 @@ public class HRPlotter implements IConstants, IQRSConstants {
         this.mPlot = plot;
 
         if (mPlotHr1) {
-            mHrFormatter1 = new LineAndPointFormatter(Color.RED,
+            mHrFormatter1 = new LineAndPointFormatter(Color.rgb(255, 65, 54), // red color,
                     null, null, null);
             mHrFormatter1.setLegendIconEnabled(false);
             mHrSeries1 = new SimpleXYSeries("HR1");
         }
         if (mPlotRr1) {
-            mRrFormatter1 = new LineAndPointFormatter(Color.rgb(0, 0x99, 0xFF),
+            mRrFormatter1 = new LineAndPointFormatter(Color.rgb(0, 0x99, 0xFF), // blue color
                     null, null, null);
             mRrFormatter1.setLegendIconEnabled(false);
             mRrSeries1 = new SimpleXYSeries("RR1");
         }
         if (mPlotHr2) {
-            mHrFormatter2 = new LineAndPointFormatter(Color.rgb(0xFF, 0x88,
-                    0xAA),
+            mHrFormatter2 = new LineAndPointFormatter(Color.rgb(0xFF, 0x88, 0xAA), // salmon color
                     null, null, null);
             mHrFormatter2.setLegendIconEnabled(false);
             mHrSeries2 = new SimpleXYSeries("HR2");
         }
         if (mPlotRr2) {
-            mRrFormatter2 = new LineAndPointFormatter(Color.rgb(0, 0xBF, 0xFF),
+            mRrFormatter2 = new LineAndPointFormatter(Color.rgb(0, 0xBF, 0xFF), // light blue
                     null, null, null);
             mRrFormatter2.setLegendIconEnabled(false);
             mRrSeries2 = new SimpleXYSeries("RR2");
