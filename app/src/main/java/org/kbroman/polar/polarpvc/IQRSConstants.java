@@ -108,4 +108,6 @@ interface IQRSConstants {
     double[] B_DERIVATIVE = {25, -48, 36, -16, 3};
 
 
+    int PVC_RS_DIST = 5;
+
 }

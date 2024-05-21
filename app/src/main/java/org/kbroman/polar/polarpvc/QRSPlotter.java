@@ -41,6 +41,9 @@ public class QRSPlotter implements IConstants, IQRSConstants {
     // Peaks
     private XYSeriesFormatter<XYRegionFormatter> mFormatter4;
     public SimpleXYSeries mSeries4;
+    // PVC
+    private XYSeriesFormatter<XYRegionFormatter> mFormatter5;
+    public SimpleXYSeries mSeries5;
 
     /**
      * The next index in the data (or the length of the series.)
@@ -85,10 +88,15 @@ public class QRSPlotter implements IConstants, IQRSConstants {
 //        .setStrokeWidth(20);
         mSeries4 = new SimpleXYSeries("Peaks");
 
+        mFormatter5 = new LineAndPointFormatter(null, Color.rgb(0x01, 0xFF, 0x70), null, null); // lime green color
+        mFormatter5.setLegendIconEnabled(false);
+        mSeries5 = new SimpleXYSeries("PVC");
+
         mPlot.addSeries(mSeries2, mFormatter2);
         mPlot.addSeries(mSeries3, mFormatter3);
         mPlot.addSeries(mSeries4, mFormatter4);
         mPlot.addSeries(mSeries1, mFormatter1);
+        mPlot.addSeries(mSeries5, mFormatter5);
         setupPlot();
     }
 
@@ -179,11 +187,15 @@ public class QRSPlotter implements IConstants, IQRSConstants {
         newPlotter.mFormatter4 = this.mFormatter4;
         newPlotter.mSeries4 = this.mSeries4;
 
+        newPlotter.mFormatter5 = this.mFormatter5;
+        newPlotter.mSeries5 = this.mSeries5;
+
         try {
             newPlotter.mPlot.addSeries(mSeries1, mFormatter1);
             newPlotter.mPlot.addSeries(mSeries2, mFormatter2);
             newPlotter.mPlot.addSeries(mSeries3, mFormatter3);
             newPlotter.mPlot.addSeries(mSeries4, mFormatter4);
+            newPlotter.mPlot.addSeries(mSeries5, mFormatter5);
             newPlotter.setupPlot();
         } catch (Exception ex) {
             String msg = "QRSPLotter.setupPLot: getGraph() is null\n"
@@ -358,6 +370,7 @@ public class QRSPlotter implements IConstants, IQRSConstants {
                     .append(",").append(mSeries2.getxVals().size())
                     .append(",").append(mSeries3.getxVals().size())
                     .append(",").append(mSeries4.getxVals().size())
+                    .append(",").append(mSeries5.getxVals().size())
                     .append("\n");
             sb.append("    time=").append(ECGActivity.sdfShort.format(new Date()))
                     .append(" mOrientationChangedQRS=")
@@ -444,6 +457,19 @@ public class QRSPlotter implements IConstants, IQRSConstants {
 //                    + " ecg=" + ecg + " mDataIndex=" + mDataIndex);
     }
 
+    public void addPVCValue(int sample, double ecg) {
+        // Remove old values if needed
+        removeOutOfRangeValues();
+        mSeries5.addLast(sample, ecg);
+    }
+
+    public void replaceLastPVCValue(int sample, double ecg) {
+        // Remove old values if needed
+        removeOutOfRangeValues();
+        mSeries5.removeLast();
+        mSeries5.addLast(sample, ecg);
+    }
+
     /**
      * Removes peaks with indices that are no longer in range.
      */
@@ -452,6 +478,9 @@ public class QRSPlotter implements IConstants, IQRSConstants {
         long xMin = mDataIndex - N_TOTAL_POINTS;
         while (mSeries4.size() > 0 && (int) mSeries4.getxVals().getFirst() < xMin) {
             mSeries4.removeFirst();
+        }
+        while (mSeries5.size() > 0 && (int) mSeries5.getxVals().getFirst() < xMin) {
+            mSeries5.removeFirst();
         }
     }
 
@@ -507,6 +536,7 @@ public class QRSPlotter implements IConstants, IQRSConstants {
         mSeries2.clear();
         mSeries3.clear();
         mSeries4.clear();
+        mSeries5.clear();
         update();
     }
 }

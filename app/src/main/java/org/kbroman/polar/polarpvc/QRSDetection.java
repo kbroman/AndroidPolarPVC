@@ -166,7 +166,7 @@ public class QRSDetection implements IConstants, IQRSConstants {
                     }
                 } // End of search
 
-                if(minPeakIndex - mPeakIndex >= 7) {
+                if(minPeakIndex - mPeakIndex >= PVC_RS_DIST) {
                     Toast.makeText(mActivity, "PVC", Toast.LENGTH_SHORT).show();
                 }
 
@@ -199,6 +199,7 @@ public class QRSDetection implements IConstants, IQRSConstants {
                         // Is not near a previous one, add it
                         mPeakIndices.add(mPeakIndex);
                         mRSdiff.add(minPeakIndex - mPeakIndex);
+                        if(minPeakIndex - mPeakIndex >= PVC_RS_DIST) qrsPlotter().addPVCValue(mPeakIndex, maxEcg);
                         qrsPlotter().addPeakValue(mPeakIndex,
                                 maxEcg);
 //                        Log.d(TAG, "doAlgorithm: " +
@@ -210,6 +211,7 @@ public class QRSDetection implements IConstants, IQRSConstants {
                     // First peak
                     mPeakIndices.add(mPeakIndex);
                     mRSdiff.add(minPeakIndex - mPeakIndex);
+                    if(minPeakIndex - mPeakIndex >= PVC_RS_DIST) qrsPlotter().addPVCValue(mPeakIndex, maxEcg);
                     qrsPlotter().addPeakValue(mPeakIndex, maxEcg);
 //                    Log.d(TAG, "doAlgorithm: " +
 //                            "addPeakValue:"
