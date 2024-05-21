@@ -90,7 +90,7 @@ public class QRSPlotter implements IConstants, IQRSConstants {
 
         mFormatter5 = new LineAndPointFormatter(null, Color.rgb(0x01, 0xFF, 0x70), null, null); // lime green color
         mFormatter5.setLegendIconEnabled(false);
-//        ((LineAndPointFormatter)mFormatter5).getVertexPaint().setStrokeWidth(20);
+        //        ((LineAndPointFormatter)mFormatter5).getVertexPaint().setStrokeWidth(20);
         mSeries5 = new SimpleXYSeries("PVC");
 
         //        mPlot.addSeries(mSeries2, mFormatter2);

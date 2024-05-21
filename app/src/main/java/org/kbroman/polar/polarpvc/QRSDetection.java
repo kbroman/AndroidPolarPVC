@@ -154,7 +154,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
                     }
                 } // End of search
 
-
                 // Check if there is a close one in the previous interval
                 if (mPeakIndices.size() > 0) {
                     lastIndex = mPeakIndices.size() - 1; // last
@@ -177,12 +176,15 @@ public class QRSDetection implements IConstants, IQRSConstants {
                             qrsPlotter().addPVCValue(mPeakIndex, maxEcg);
                             mActivity.PVCdata.add(1.0);
 
-                            //                            Toast.makeText(mActivity, "PVC " + Math.round(mActivity.PVCdata.sum()) +
-                            //                                           " / " + mActivity.PVCdata.size(), Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(mActivity, "PVC " + Math.round(mActivity.PVCdata.sum()) +
+//                                           " / " + mActivity.PVCdata.size(), Toast.LENGTH_SHORT).show();
 
                         } else { mActivity.PVCdata.add(0.0); }
                         qrsPlotter().addPeakValue(mPeakIndex, maxEcg);
                     }
+
+                    Log.d(TAG, (minPeakIndex - mPeakIndex) + " " + (maxEcg - minEcg));
+
                 } else {
                     // First peak
                     mPeakIndices.add(mPeakIndex);
@@ -191,8 +193,8 @@ public class QRSDetection implements IConstants, IQRSConstants {
                         qrsPlotter().addPVCValue(mPeakIndex, maxEcg);
                         mActivity.PVCdata.add(1.0);
 
-                        //                        Toast.makeText(mActivity, "PVC " + Math.round(mActivity.PVCdata.sum()) +
-                        //                                       " / " + mActivity.PVCdata.size(), Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(mActivity, "PVC " + Math.round(mActivity.PVCdata.sum()) +
+//                                       " / " + mActivity.PVCdata.size(), Toast.LENGTH_SHORT).show();
 
                     } else { mActivity.PVCdata.add(0.0); }
                     qrsPlotter().addPeakValue(mPeakIndex, maxEcg);
