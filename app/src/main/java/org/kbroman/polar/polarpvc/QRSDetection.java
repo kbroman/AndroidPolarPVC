@@ -2,9 +2,14 @@ package org.kbroman.polar.polarpvc;
 
 import com.polar.sdk.api.model.PolarEcgData;
 
+import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
+
 
 public class QRSDetection implements IConstants, IQRSConstants {
 
@@ -12,7 +17,12 @@ public class QRSDetection implements IConstants, IQRSConstants {
 
     private final FixedSizeList<Integer> mPeakIndices =
             new FixedSizeList<>(DATA_WINDOW);
+
+    private final FixedSizeList<Integer> mRSdiff =
+            new FixedSizeList<>(DATA_WINDOW);
+
     private int mPeakIndex = -1;
+    private int minPeakIndex = -1; // to store location of minimum
     private int mMinPeakIndex = -1;
     private int mMaxPeakIndex = -1;
 
@@ -116,7 +126,7 @@ public class QRSDetection implements IConstants, IQRSConstants {
         mThreshold = mMean + N_SIGMA * mStdDev;
         curScore.add(mThreshold);
 
-        double val, maxEcg, lastMaxEcgVal;
+        double val, maxEcg, lastMaxEcgVal, minEcg, lastMinEcgVal;
         double scoreval;
         int lastIndex, lastPeakIndex, startSearch, endSearch;
 
@@ -140,6 +150,7 @@ public class QRSDetection implements IConstants, IQRSConstants {
                 if (startSearch < 0) startSearch = 0;
                 endSearch = Math.min(i, mMaxPeakIndex + SEARCH_EXTEND);
                 maxEcg = -Double.MAX_VALUE;
+                minEcg = +Double.MAX_VALUE;
 //                Log.d(TAG, "doAlgorithm: " +
 //                        ".......... start searching: startSearch="
 //                        + startSearch
@@ -149,7 +160,16 @@ public class QRSDetection implements IConstants, IQRSConstants {
                         maxEcg = ecgVals.get(i1);
                         mPeakIndex = i1;
                     }
+                    if (ecgVals.get(i1) < minEcg) {
+                        minEcg = ecgVals.get(i1);
+                        minPeakIndex = i1;
+                    }
                 } // End of search
+
+                if(minPeakIndex - mPeakIndex >= 7) {
+                    Toast.makeText(mActivity, "PVC", Toast.LENGTH_SHORT).show();
+                }
+
 //                Log.d(TAG, "doAlgorithm: " +
 //                        ".......... end searching: startSearch="
 //                        + startSearch
@@ -167,6 +187,7 @@ public class QRSDetection implements IConstants, IQRSConstants {
                         if (maxEcg >= lastMaxEcgVal) {
                             // Replace the old one
                             mPeakIndices.setLast(mPeakIndex);
+                            mRSdiff.setLast(minPeakIndex - mPeakIndex);
                             qrsPlotter().replaceLastPeakValue(mPeakIndex,
                                     maxEcg);
 //                            Log.d(TAG, "doAlgorithm: " +
@@ -177,6 +198,7 @@ public class QRSDetection implements IConstants, IQRSConstants {
                     } else {
                         // Is not near a previous one, add it
                         mPeakIndices.add(mPeakIndex);
+                        mRSdiff.add(minPeakIndex - mPeakIndex);
                         qrsPlotter().addPeakValue(mPeakIndex,
                                 maxEcg);
 //                        Log.d(TAG, "doAlgorithm: " +
@@ -187,6 +209,7 @@ public class QRSDetection implements IConstants, IQRSConstants {
                 } else {
                     // First peak
                     mPeakIndices.add(mPeakIndex);
+                    mRSdiff.add(minPeakIndex - mPeakIndex);
                     qrsPlotter().addPeakValue(mPeakIndex, maxEcg);
 //                    Log.d(TAG, "doAlgorithm: " +
 //                            "addPeakValue:"
@@ -291,4 +314,5 @@ public class QRSDetection implements IConstants, IQRSConstants {
     public HRPlotter hrPlotter() {
         return mActivity.mHRPlotter;
     }
+
 }
