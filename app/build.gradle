@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 33
     defaultConfig {
-        applicationId "net.kenevans.polar.polarecg"
+        applicationId "org.kbroman.polar.polarpvc"
         minSdkVersion 23
         targetSdkVersion 33
         versionCode 18
@@ -16,14 +16,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             applicationVariants.all { variant ->
                 variant.outputs.all { output ->
-                    def appName = "KE.Net ECG"
+                    def appName = "Polar PVC"
                     def formattedDate = new Date().format('yyyyMMddHHmmss')
                     outputFileName = "${appName}-${variant.versionName}-${variant.name}-${formattedDate}.apk"
                 }
             }
         }
     }
-    namespace 'net.kenevans.polar.polarecg'
+    namespace 'org.kbroman.polar.polarpvc'
 }
 
 dependencies {
@@ -49,7 +49,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
-    
+
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.code.gson:gson:2.10.1'

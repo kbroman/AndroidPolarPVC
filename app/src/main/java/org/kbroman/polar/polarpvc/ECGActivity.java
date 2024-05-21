@@ -1,4 +1,4 @@
-package net.kenevans.polar.polarecg;
+package org.kbroman.polar.polarpvc;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
@@ -955,7 +955,7 @@ public class ECGActivity extends AppCompatActivity
                 int nSamples = ecgvals.length;
                 String duration = String.format(Locale.US, "%.1f sec",
                         nSamples / FS);
-                out.write("application=" + "KE.Net ECG Version: "
+                out.write("application=" + "Polar PVC Version: "
                         + Utils.getVersion(this) + "\n");
                 out.write("stoptime=" + mStopTime.toString() + "\n");
                 out.write("duration=" + duration + "\n");
@@ -1144,7 +1144,7 @@ public class ECGActivity extends AppCompatActivity
         } catch (Exception ex) {
             // Do nothing
         }
-        msg.append("KE.Net ECG Version: ").
+        msg.append("Polar PVC Version: ").
                 append(versionName).append("\n");
         msg.append("Polar BLE API Version: ").
                 append(PolarBleApiDefaultImpl.versionInfo()).append("\n");

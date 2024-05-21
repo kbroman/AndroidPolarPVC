@@ -1,4 +1,4 @@
-package net.kenevans.polar.polarecg;
+package org.kbroman.polar.polarpvc;
 
 public interface PlotterListener{
     void update();

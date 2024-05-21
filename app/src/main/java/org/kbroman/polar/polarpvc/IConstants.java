@@ -1,7 +1,7 @@
-package net.kenevans.polar.polarecg;
+package org.kbroman.polar.polarpvc;
 
 public interface IConstants {
-    String TAG = "KE.NetECG";
+    String TAG = "Polar PVC";
 
     // Plotting
     /**
@@ -17,7 +17,7 @@ public interface IConstants {
     /**
      * Name of the package for this application.
      */
-    String PACKAGE_NAME = "net.kenevans.polar.polarecg";
+    String PACKAGE_NAME = "org.kbroman.polar.polarpvc";
 
     String PREF_DEVICE_ID = "deviceId";
     String PREF_MRU_DEVICE_IDS = "mruDeviceIds";

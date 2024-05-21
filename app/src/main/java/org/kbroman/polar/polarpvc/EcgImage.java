@@ -1,4 +1,4 @@
-package net.kenevans.polar.polarecg;
+package org.kbroman.polar.polarpvc;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -130,7 +130,7 @@ class EcgImage {
         paint.setTypeface(fontLogo);
         paint.setTextSize(48);
         paint.setColor(0xffd30024);
-        canvas.drawText("KE.Net ECG", 2170, 180, paint);
+        canvas.drawText("Polar PVC", 2170, 180, paint);
 
         // Draw the small grid lines
         paint.setStrokeWidth(MINOR_WIDTH);

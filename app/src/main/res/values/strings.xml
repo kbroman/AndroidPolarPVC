@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">KE.Net ECG</string>
+    <string name="app_name">Polar PVC</string>
     <string name="settings_name">Settings</string>
     <string name="plot_title">25 mm/s, 10 mm/mV</string>
     <string name="plot_range_title">mV</string>
