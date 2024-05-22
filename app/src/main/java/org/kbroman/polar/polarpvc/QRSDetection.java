@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.List;
 import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 public class QRSDetection implements IConstants, IQRSConstants {
@@ -16,9 +15,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
     private final ECGActivity mActivity;
 
     private final FixedSizeList<Integer> mPeakIndices =
-            new FixedSizeList<>(DATA_WINDOW);
-
-    private final FixedSizeList<Integer> mRSdiff =
             new FixedSizeList<>(DATA_WINDOW);
 
     private int mPeakIndex = -1;
@@ -98,6 +94,8 @@ public class QRSDetection implements IConstants, IQRSConstants {
         double doubleVal, hr, rr;
         double variance;
 
+        Boolean peakFound=false;
+
 //        // Butterworth
 //        input = curEcg;
 //        if (curButterworth.size() == DATA_WINDOW) curButterworth.remove(0);
@@ -126,7 +124,7 @@ public class QRSDetection implements IConstants, IQRSConstants {
 
         double val, maxEcg, lastMaxEcgVal, minEcg, lastMinEcgVal;
         double scoreval;
-        int lastIndex, lastPeakIndex, startSearch, endSearch;
+        int lastIndex, lastPeakIndex, startSearch, endSearch, thisPeakIndex;
 
         input = curDeriv;
         int i = mNSamples - 1;
@@ -142,15 +140,10 @@ public class QRSDetection implements IConstants, IQRSConstants {
                 if (startSearch < 0) startSearch = 0;
                 endSearch = Math.min(i, mMaxPeakIndex + SEARCH_EXTEND);
                 maxEcg = -Double.MAX_VALUE;
-                minEcg = +Double.MAX_VALUE;
                 for (int i1 = startSearch; i1 < endSearch + 1; i1++) {
                     if (ecgVals.get(i1) > maxEcg) {
                         maxEcg = ecgVals.get(i1);
                         mPeakIndex = i1;
-                    }
-                    if (ecgVals.get(i1) < minEcg) {
-                        minEcg = ecgVals.get(i1);
-                        minPeakIndex = i1;
                     }
                 } // End of search
 
@@ -164,42 +157,59 @@ public class QRSDetection implements IConstants, IQRSConstants {
                         if (maxEcg >= lastMaxEcgVal) {
                             // Replace the old one
                             mPeakIndices.setLast(mPeakIndex);
-                            mRSdiff.setLast(minPeakIndex - mPeakIndex);
-                            qrsPlotter().replaceLastPeakValue(mPeakIndex,
-                                    maxEcg);
+                            qrsPlotter().replaceLastPeakValue(mPeakIndex, maxEcg);
                         }
                     } else {
                         // Is not near a previous one, add it
                         mPeakIndices.add(mPeakIndex);
-                        mRSdiff.add(minPeakIndex - mPeakIndex);
-                        if(minPeakIndex - mPeakIndex >= PVC_RS_DIST) {
-                            qrsPlotter().addPVCValue(mPeakIndex, maxEcg);
-                            mActivity.PVCdata.add(1.0);
-
-//                            Toast.makeText(mActivity, "PVC " + Math.round(mActivity.PVCdata.sum()) +
-//                                           " / " + mActivity.PVCdata.size(), Toast.LENGTH_SHORT).show();
-
-                        } else { mActivity.PVCdata.add(0.0); }
                         qrsPlotter().addPeakValue(mPeakIndex, maxEcg);
+
+                        peakFound=true;
+                        Log.d(TAG, "peak added: " + mPeakIndex);
                     }
 
-                    Log.d(TAG, (minPeakIndex - mPeakIndex) + " " + (maxEcg - minEcg));
-
                 } else {
+
                     // First peak
                     mPeakIndices.add(mPeakIndex);
-                    mRSdiff.add(minPeakIndex - mPeakIndex);
-                    if(minPeakIndex - mPeakIndex >= PVC_RS_DIST) {
-                        qrsPlotter().addPVCValue(mPeakIndex, maxEcg);
-                        mActivity.PVCdata.add(1.0);
-
-//                        Toast.makeText(mActivity, "PVC " + Math.round(mActivity.PVCdata.sum()) +
-//                                       " / " + mActivity.PVCdata.size(), Toast.LENGTH_SHORT).show();
-
-                    } else { mActivity.PVCdata.add(0.0); }
                     qrsPlotter().addPeakValue(mPeakIndex, maxEcg);
 
+                    peakFound=true;
+                    Log.d(TAG, "peak added: " + mPeakIndex);
                 }
+
+
+                if(peakFound && mPeakIndices.size() > 5) {
+                    peakFound=false;
+
+                    lastPeakIndex = mPeakIndices.get(mPeakIndices.size()-2);
+                    thisPeakIndex = mPeakIndices.get(mPeakIndices.size()-1);
+
+                    minEcg = Double.MAX_VALUE;
+                    minPeakIndex = -1;
+                    endSearch = (int)Math.min((double)(thisPeakIndex - lastPeakIndex)/2.0, 20.0);
+
+                    for (int i1 = 3; i1 < endSearch; i1++) {
+                        if (ecgVals.get(lastPeakIndex + i1) < minEcg) {
+                            minEcg = ecgVals.get(lastPeakIndex + i1);
+                            minPeakIndex = i1;
+                        }
+                        Log.d(TAG, i1 + " " + ecgVals.get(lastPeakIndex+i1) + " " +
+                              minPeakIndex + " " + minEcg);
+                    }
+
+                    if(minPeakIndex >= PVC_RS_DIST) { // looks like a PVC
+                        qrsPlotter().addPVCValue(lastPeakIndex, ecgVals.get(lastPeakIndex));
+                        mActivity.PVCdata.add(1.0);
+                    } else {                          // not a PVC
+                        mActivity.PVCdata.add(0.0);
+                    }
+
+                    Log.d(TAG, lastPeakIndex + " " + ecgVals.get(lastPeakIndex) + " " +
+                               thisPeakIndex + " " + ecgVals.get(thisPeakIndex) + " " +
+                               minPeakIndex + " " + minEcg + " " + ecgVals.size());
+                }
+
 
                 // Do HR/RR plot
                 if (mPeakIndices.size() > 1) {
