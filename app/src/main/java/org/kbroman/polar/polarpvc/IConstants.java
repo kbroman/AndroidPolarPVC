@@ -39,4 +39,8 @@ public interface IConstants {
      * Intent code for showing settings.
      */
     String SETTINGS_CODE = PACKAGE_NAME + ".SettingsCode";
+
+    /* number of peaks to use in estimating percent PVC */
+    int NUM_PEAKS_FOR_PVC_AVE = 100;
+
 }
