@@ -110,10 +110,10 @@ interface IQRSConstants {
 
     /**
      * minimum Ecg value for a peak (don't call a peak if it's below this)
-     * this is in terms of z-score, (value - mean)/sd
+     * this is in terms of number of SDs above the mean,
      * where mean and sd are from running window
      */
-    double MIN_PEAK_ECG_VALUE = 1.5;
+    double MIN_PEAK_ECG_VALUE = 1.0;
     /**
      * size of window for the running mean and sd
      */
