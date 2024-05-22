@@ -6,9 +6,6 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import android.util.Log;
-import android.widget.TextView;
-
 
 public class QRSDetection implements IConstants, IQRSConstants {
 
@@ -165,7 +162,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
                         qrsPlotter().addPeakValue(mPeakIndex, maxEcg);
 
                         peakFound=true;
-                        Log.d(TAG, "peak added: " + mPeakIndex);
                     }
 
                 } else {
@@ -175,7 +171,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
                     qrsPlotter().addPeakValue(mPeakIndex, maxEcg);
 
                     peakFound=true;
-                    Log.d(TAG, "peak added: " + mPeakIndex);
                 }
 
 
@@ -194,8 +189,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
                             minEcg = ecgVals.get(lastPeakIndex + i1);
                             minPeakIndex = i1;
                         }
-                        Log.d(TAG, i1 + " " + ecgVals.get(lastPeakIndex+i1) + " " +
-                              minPeakIndex + " " + minEcg);
                     }
 
                     if(minPeakIndex >= PVC_RS_DIST) { // looks like a PVC
@@ -205,9 +198,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
                         mActivity.PVCdata.add(0.0);
                     }
 
-                    Log.d(TAG, lastPeakIndex + " " + ecgVals.get(lastPeakIndex) + " " +
-                               thisPeakIndex + " " + ecgVals.get(thisPeakIndex) + " " +
-                               minPeakIndex + " " + minEcg + " " + ecgVals.size());
                 }
 
 
