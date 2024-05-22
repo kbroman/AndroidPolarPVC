@@ -6,6 +6,8 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import android.util.Log;
+
 
 public class QRSDetection implements IConstants, IQRSConstants {
 
@@ -61,6 +63,8 @@ public class QRSDetection implements IConstants, IQRSConstants {
     private final RunningAverage movingAverageRr =
             new RunningAverage(MOV_AVG_HR_WINDOW);
 
+    private final RunningAveSD movingAveSDecg = new RunningAveSD(MOVING_AVESD_WINDOW);
+
     public QRSDetection(ECGActivity activity) {
         mActivity = activity;
     }
@@ -69,10 +73,12 @@ public class QRSDetection implements IConstants, IQRSConstants {
         // Update the ECG plot
         ecgPlotter().addValues(polarEcgData);
 
-        // samples contains the ecgVals values in μV, mv = .001 * μV;
         for (Integer val : polarEcgData.samples) {
+            movingAveSDecg.add((double) (MICRO_TO_MILLI_VOLT * val)); // keep running average and SD
+            // samples contains the ecgVals values in μV, mv = .001 * μV;
             doAlgorithm(MICRO_TO_MILLI_VOLT * val);
         }
+
     }
 
     /**
@@ -145,7 +151,8 @@ public class QRSDetection implements IConstants, IQRSConstants {
                 } // End of search
 
                 // Check if there is a close one in the previous interval
-                if(maxEcg >= MIN_PEAK_ECG_VALUE) { // if maxEcg is small, don't call it a peak
+                if((maxEcg - movingAveSDecg.average())/movingAveSDecg.sd() >= MIN_PEAK_ECG_VALUE) { // if maxEcg is small, don't call it a peak
+
                     if (mPeakIndices.size() > 0) {
                         lastIndex = mPeakIndices.size() - 1; // last
                         // index in mPeakIndices
@@ -157,7 +164,7 @@ public class QRSDetection implements IConstants, IQRSConstants {
                                 mPeakIndices.setLast(mPeakIndex);
                                 qrsPlotter().replaceLastPeakValue(mPeakIndex, maxEcg);
                             }
-                        } else if(maxEcg > MIN_PEAK_ECG_VALUE) { // if ecg value is really small, ignore it
+                        } else {
                             // Is not near a previous one, add it
                             mPeakIndices.add(mPeakIndex);
                             qrsPlotter().addPeakValue(mPeakIndex, maxEcg);

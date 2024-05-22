@@ -108,16 +108,25 @@ interface IQRSConstants {
     double[] B_DERIVATIVE = {25, -48, 36, -16, 3};
 
 
-    /* minimum Ecg value for a peak (don't call a peak if it's below this) */
-    /* this doesn't work; needs to be a multiple of the mean ECG value */
-    /* (I originally used 0.25, then switched to 0.15, but find that it depends on placement of sensor) */
-    /* large negative number basically disables it */
-    double MIN_PEAK_ECG_VALUE = -2;
+    /**
+     * minimum Ecg value for a peak (don't call a peak if it's below this)
+     * this is in terms of z-score, (value - mean)/sd
+     * where mean and sd are from running window
+     */
+    double MIN_PEAK_ECG_VALUE = 1.5;
+    /**
+     * size of window for the running mean and sd
+     */
+    int MOVING_AVESD_WINDOW = 500;
 
-    /* conclude PVC if if number of samples between R and S peaks is >= this */
+    /**
+     * conclude PVC if if number of samples between R and S peaks is >= this
+     */
     int PVC_RS_DIST = 5;
 
-    /* number of peaks to skip before starting to call PVCs */
+    /**
+     * number of peaks to skip before starting to call PVCs
+     */
     int INITIAL_PEAKS_TO_SKIP = 5;
 
 }
