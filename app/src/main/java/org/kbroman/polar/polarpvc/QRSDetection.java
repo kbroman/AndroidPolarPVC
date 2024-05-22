@@ -145,38 +145,37 @@ public class QRSDetection implements IConstants, IQRSConstants {
                 } // End of search
 
                 // Check if there is a close one in the previous interval
-                if (mPeakIndices.size() > 0) {
-                    lastIndex = mPeakIndices.size() - 1; // last
-                    // index in mPeakIndices
-                    lastPeakIndex = mPeakIndices.get(lastIndex);
-                    if (mPeakIndex - lastPeakIndex < HR_200_INTERVAL) {
-                        lastMaxEcgVal = ecgVals.get(lastPeakIndex);
-                        if (maxEcg >= lastMaxEcgVal) {
-                            // Replace the old one
-                            mPeakIndices.setLast(mPeakIndex);
-                            qrsPlotter().replaceLastPeakValue(mPeakIndex, maxEcg);
+                if(maxEcg >= 0.25) { // if maxEcg is < 0.25, don't call it a peak
+                    if (mPeakIndices.size() > 0) {
+                        lastIndex = mPeakIndices.size() - 1; // last
+                        // index in mPeakIndices
+                        lastPeakIndex = mPeakIndices.get(lastIndex);
+                        if (mPeakIndex - lastPeakIndex < HR_200_INTERVAL) {
+                            lastMaxEcgVal = ecgVals.get(lastPeakIndex);
+                            if (maxEcg >= lastMaxEcgVal) {
+                                // Replace the old one
+                                mPeakIndices.setLast(mPeakIndex);
+                                qrsPlotter().replaceLastPeakValue(mPeakIndex, maxEcg);
+                            }
+                        } else if(maxEcg > 0.25) { // if ecg value is really small, ignore it
+                            // Is not near a previous one, add it
+                            mPeakIndices.add(mPeakIndex);
+                            qrsPlotter().addPeakValue(mPeakIndex, maxEcg);
+
+                            peakFound=true;
                         }
+
                     } else {
-                        // Is not near a previous one, add it
+                        // First peak
                         mPeakIndices.add(mPeakIndex);
                         qrsPlotter().addPeakValue(mPeakIndex, maxEcg);
 
                         peakFound=true;
                     }
-
-                } else {
-
-                    // First peak
-                    mPeakIndices.add(mPeakIndex);
-                    qrsPlotter().addPeakValue(mPeakIndex, maxEcg);
-
-                    peakFound=true;
                 }
 
 
                 if(peakFound && mPeakIndices.size() > 5) {
-                    peakFound=false;
-
                     lastPeakIndex = mPeakIndices.get(mPeakIndices.size()-2);
                     thisPeakIndex = mPeakIndices.get(mPeakIndices.size()-1);
 
@@ -197,7 +196,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
                     } else {                          // not a PVC
                         mActivity.PVCdata.add(0.0);
                     }
-
                 }
 
 
