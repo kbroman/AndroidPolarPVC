@@ -82,25 +82,25 @@ public class HRPlotter implements IConstants, IQRSConstants {
         this.mPlot = plot;
 
         if (mPlotHr1) {
-            mHrFormatter1 = new LineAndPointFormatter(Color.rgb(255, 65, 54), // red color,
+            mHrFormatter1 = new LineAndPointFormatter(Color.rgb(255, 65, 54), // red color (HR from Polar)
                     null, null, null);
             mHrFormatter1.setLegendIconEnabled(false);
             mHrSeries1 = new SimpleXYSeries("HR1");
         }
         if (mPlotRr1) {
-            mRrFormatter1 = new LineAndPointFormatter(Color.rgb(0, 0x99, 0xFF), // blue color
+            mRrFormatter1 = new LineAndPointFormatter(Color.rgb(0, 0x99, 0xFF), // blue color (RR from Polar)
                     null, null, null);
             mRrFormatter1.setLegendIconEnabled(false);
             mRrSeries1 = new SimpleXYSeries("RR1");
         }
         if (mPlotHr2) {
-            mHrFormatter2 = new LineAndPointFormatter(Color.rgb(0xFF, 0x88, 0xAA), // salmon color
+            mHrFormatter2 = new LineAndPointFormatter(Color.rgb(0xFF, 0x88, 0xAA), // salmon color (HR re-calculated)
                     null, null, null);
             mHrFormatter2.setLegendIconEnabled(false);
             mHrSeries2 = new SimpleXYSeries("HR2");
         }
         if (mPlotRr2) {
-            mRrFormatter2 = new LineAndPointFormatter(Color.rgb(0, 0xBF, 0xFF), // light blue
+            mRrFormatter2 = new LineAndPointFormatter(Color.rgb(0, 0xBF, 0xFF), // light blue (RR re-calculated)
                     null, null, null);
             mRrFormatter2.setLegendIconEnabled(false);
             mRrSeries2 = new SimpleXYSeries("RR2");
@@ -108,8 +108,8 @@ public class HRPlotter implements IConstants, IQRSConstants {
 
         mPlot.addSeries(mHrSeries1, mHrFormatter1);
         mPlot.addSeries(mRrSeries1, mRrFormatter1);
-        mPlot.addSeries(mHrSeries2, mHrFormatter2);
-        mPlot.addSeries(mRrSeries2, mRrFormatter2);
+        //        mPlot.addSeries(mHrSeries2, mHrFormatter2);
+        //        mPlot.addSeries(mRrSeries2, mRrFormatter2);
         setupPlot();
     }
 
@@ -149,8 +149,8 @@ public class HRPlotter implements IConstants, IQRSConstants {
 
         newPlotter.mPlot.addSeries(mHrSeries1, mHrFormatter1);
         newPlotter.mPlot.addSeries(mRrSeries1, mRrFormatter1);
-        newPlotter.mPlot.addSeries(mHrSeries2, mHrFormatter2);
-        newPlotter.mPlot.addSeries(mRrSeries2, mRrFormatter2);
+        //        newPlotter.mPlot.addSeries(mHrSeries2, mHrFormatter2);
+        //        newPlotter.mPlot.addSeries(mRrSeries2, mRrFormatter2);
         newPlotter.setupPlot();
 
         return newPlotter;
