@@ -108,6 +108,13 @@ interface IQRSConstants {
     double[] B_DERIVATIVE = {25, -48, 36, -16, 3};
 
 
+    /* minimum Ecg value for a peak (don't call a peak if it's below this) */
+    double MIN_PEAK_ECG_VALUE = 0.15;
+
+    /* conclude PVC if if number of samples between R and S peaks is >= this */
     int PVC_RS_DIST = 5;
+
+    /* number of peaks to skip before starting to call PVCs */
+    int INITIAL_PEAKS_TO_SKIP = 5;
 
 }

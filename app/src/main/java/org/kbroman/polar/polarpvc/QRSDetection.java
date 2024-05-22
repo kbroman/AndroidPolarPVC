@@ -145,7 +145,7 @@ public class QRSDetection implements IConstants, IQRSConstants {
                 } // End of search
 
                 // Check if there is a close one in the previous interval
-                if(maxEcg >= 0.25) { // if maxEcg is < 0.25, don't call it a peak
+                if(maxEcg >= MIN_PEAK_ECG_VALUE) { // if maxEcg is small, don't call it a peak
                     if (mPeakIndices.size() > 0) {
                         lastIndex = mPeakIndices.size() - 1; // last
                         // index in mPeakIndices
@@ -157,7 +157,7 @@ public class QRSDetection implements IConstants, IQRSConstants {
                                 mPeakIndices.setLast(mPeakIndex);
                                 qrsPlotter().replaceLastPeakValue(mPeakIndex, maxEcg);
                             }
-                        } else if(maxEcg > 0.25) { // if ecg value is really small, ignore it
+                        } else if(maxEcg > MIN_PEAK_ECG_VALUE) { // if ecg value is really small, ignore it
                             // Is not near a previous one, add it
                             mPeakIndices.add(mPeakIndex);
                             qrsPlotter().addPeakValue(mPeakIndex, maxEcg);
@@ -175,7 +175,7 @@ public class QRSDetection implements IConstants, IQRSConstants {
                 }
 
 
-                if(peakFound && mPeakIndices.size() > 5) {
+                if(peakFound && mPeakIndices.size() > INITIAL_PEAKS_TO_SKIP) {
                     lastPeakIndex = mPeakIndices.get(mPeakIndices.size()-2);
                     thisPeakIndex = mPeakIndices.get(mPeakIndices.size()-1);
 
