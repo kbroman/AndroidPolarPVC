@@ -109,7 +109,10 @@ interface IQRSConstants {
 
 
     /* minimum Ecg value for a peak (don't call a peak if it's below this) */
-    double MIN_PEAK_ECG_VALUE = 0.15;
+    /* this doesn't work; needs to be a multiple of the mean ECG value */
+    /* (I originally used 0.25, then switched to 0.15, but find that it depends on placement of sensor) */
+    /* large negative number basically disables it */
+    double MIN_PEAK_ECG_VALUE = -2;
 
     /* conclude PVC if if number of samples between R and S peaks is >= this */
     int PVC_RS_DIST = 5;
