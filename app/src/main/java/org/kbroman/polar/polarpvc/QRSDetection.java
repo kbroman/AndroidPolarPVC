@@ -179,6 +179,8 @@ public class QRSDetection implements IConstants, IQRSConstants {
 
                         peakFound=true;
                     }
+                } else {
+                    Log.d(TAG, "low peak: " + Math.round((maxEcg - movingAveSDecg.average()) / movingAveSDecg.sd()*100)/100.0);
                 }
 
 

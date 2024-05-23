@@ -113,7 +113,7 @@ interface IQRSConstants {
      * this is in terms of number of SDs above the mean,
      * where mean and sd are from running window
      */
-    double MIN_PEAK_ECG_VALUE = 1.0;
+    double MIN_PEAK_ECG_VALUE = 0.5;
     /**
      * size of window for the running mean and sd
      */
