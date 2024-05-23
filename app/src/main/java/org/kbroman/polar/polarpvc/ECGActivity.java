@@ -1159,11 +1159,11 @@ public class ECGActivity extends AppCompatActivity
             Utils.errMsg(this, "streamECG: Device is not connected yet");
             return;
         }
-//        logEpochInfo("UTC");
+//        logEpochInfo(TIME_ZONE);
         if (mEcgDisposable == null) {
             // Set the local time to get correct timestamps. H10 apparently
             // resets its time to 01:01:2019 00:00:00 when connected to strap
-            TimeZone timeZone = TimeZone.getTimeZone("UTC");
+            TimeZone timeZone = TimeZone.getTimeZone(TIME_ZONE);
             Calendar calNow = Calendar.getInstance(timeZone);
             Log.d(TAG, "setLocalTime to " + calNow.getTime());
             mApi.setLocalTime(mDeviceId, calNow);
@@ -1223,8 +1223,8 @@ public class ECGActivity extends AppCompatActivity
         SimpleDateFormat sdf2 =
                 new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
         /// Set the timezone
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        sdf2.setTimeZone(TimeZone.getTimeZone("UTC"));
+        sdf.setTimeZone(TimeZone.getTimeZone(TIME_ZONE));
+        sdf2.setTimeZone(TimeZone.getTimeZone(TIME_ZONE));
         try {
             Date epoch = sdf.parse("01:01:2000 00:00:00");
             Date epoch1 = sdf.parse("01:01:2019 00:00:00");
@@ -1251,7 +1251,7 @@ public class ECGActivity extends AppCompatActivity
     public static String timestampInfo(long ts, String name) {
         SimpleDateFormat sdf =
                 new SimpleDateFormat("MMM dd yyyy HH:mm:ss zzz", Locale.US);
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        sdf.setTimeZone(TimeZone.getTimeZone(TIME_ZONE));
         SimpleDateFormat sdf1 =
                 new SimpleDateFormat("MMM dd yyyy HH:mm:ss zzz", Locale.US);
         Date date = new Date(ts);
@@ -1261,8 +1261,9 @@ public class ECGActivity extends AppCompatActivity
     }
 
     public void setInfoText() {
-        String format = "MMMM dd, yyyy";
+        String format = "yyyy-MM-dd";
         SimpleDateFormat df = new SimpleDateFormat(format, Locale.US);
+        df.setTimeZone(TimeZone.getTimeZone(TIME_ZONE));
         mTextViewInfo.setText(getString(R.string.info_string,
                 mName, mBatteryLevel, mFirmware, mDeviceId,
                 df.format(new Date())));

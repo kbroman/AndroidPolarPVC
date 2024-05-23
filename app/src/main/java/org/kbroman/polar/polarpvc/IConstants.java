@@ -43,4 +43,7 @@ public interface IConstants {
     /* number of peaks to use in estimating percent PVC */
     int NUM_PEAKS_FOR_PVC_AVE = 100;
 
+    /* Time Zone */
+    String TIME_ZONE = "America/Chicago";
+
 }
