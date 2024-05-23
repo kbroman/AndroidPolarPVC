@@ -1265,8 +1265,7 @@ public class ECGActivity extends AppCompatActivity
         SimpleDateFormat df = new SimpleDateFormat(format, Locale.US);
         df.setTimeZone(TimeZone.getTimeZone(TIME_ZONE));
         mTextViewInfo.setText(getString(R.string.info_string,
-                mName, mBatteryLevel, mFirmware, mDeviceId,
-                df.format(new Date())));
+                mName, mBatteryLevel, mFirmware, df.format(new Date())));
     }
 
     @SuppressWarnings("unused")
