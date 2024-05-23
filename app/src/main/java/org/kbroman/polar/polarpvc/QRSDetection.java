@@ -73,13 +73,93 @@ public class QRSDetection implements IConstants, IQRSConstants {
         // Update the ECG plot
         ecgPlotter().addValues(polarEcgData);
 
+        /*
         for (Integer val : polarEcgData.samples) {
             movingAveSDecg.add((double) (MICRO_TO_MILLI_VOLT * val)); // keep running average and SD
             // samples contains the ecgVals values in μV, mv = .001 * μV;
             doAlgorithm(MICRO_TO_MILLI_VOLT * val);
         }
+        */
 
+        int start, end, n;
+
+        // grab a batch of data
+        if(ecgVals.isEmpty()) start = 0;
+        else start = ecgVals.size();
+        for(Integer val : polarEcgData.samples) {
+            ecgVals.add(MICRO_TO_MILLI_VOLT * val);
+
+            qrsPlotter().addValues(MICRO_TO_MILLI_VOLT * val, 0.0, 0.0);
+        }
+        n = ecgVals.size() - start;
+
+        if(ecgVals.size() < 500) return; // wait to start looking for peaks
+
+        // look for peaks in first half
+        end = start + n/2;
+        start = Math.max(0, start-5);
+        find_peaks(start, end);
+
+        // look for peaks in second half
+        start = Math.max(0, end-5);
+        find_peaks(start, ecgVals.size());
     }
+
+    // array to hold smoothed squared differences
+    private final ArrayList<Double> smsqdiff = new ArrayList<>();
+
+    int lastPeak=-1;
+    double last_smsqdiff = -Double.MAX_VALUE;
+
+    public void find_peaks(int start, int end) {
+        // Record the start time as now.
+        if (Double.isNaN(mStartTime)) mStartTime = new Date().getTime();
+
+        if(!smsqdiff.isEmpty()) smsqdiff.clear();
+        // get squared differences
+        for(int i=start; i<end-1; i++) {
+            double diff = (ecgVals.get(i) - ecgVals.get(i+1));
+            smsqdiff.add(diff * diff);
+        }
+        smsqdiff.add(0.0);
+        smsqdiff.add(0.0);
+
+        // smooth in groups of three
+        for(int i=0; i<smsqdiff.size()-2; i++) {
+            smsqdiff.set(i, (smsqdiff.get(i)+smsqdiff.get(i+1)+smsqdiff.get(i+2))/3.0);
+
+            movingAveSDecg.add(smsqdiff.get(i)); // get running mean and SD
+        }
+
+        // find maximum
+        int max_index = which_max(smsqdiff);
+        double this_smsqdiff = smsqdiff.get(max_index);
+        mPeakIndex = max_index + start;
+
+        Log.d(TAG, max_index + " " + start + " " + end + " " + ecgVals.size() + " " + mPeakIndex);
+
+        double this_ecg = ecgVals.get(mPeakIndex);
+
+        Boolean peakFound=false;
+
+        if((this_smsqdiff - movingAveSDecg.average())/movingAveSDecg.sd() >= MIN_PEAK_ECG_VALUE) { // peak only if large
+            if(mPeakIndices.size() == 0 || mPeakIndex - lastPeak >= HR_200_INTERVAL) { // new peak
+                peakFound = true;
+                last_smsqdiff = this_smsqdiff;
+                lastPeak = mPeakIndex;
+                mPeakIndices.add(mPeakIndex);
+                qrsPlotter().addPeakValue(mPeakIndex, this_ecg);
+            } else { // too close to previous peak
+                if(this_smsqdiff > last_smsqdiff) {
+                    last_smsqdiff = this_smsqdiff;
+                    lastPeak = mPeakIndex;
+                    mPeakIndices.setLast(mPeakIndex);
+                    qrsPlotter().replaceLastPeakValue(mPeakIndex, this_ecg);
+                }
+            }
+        }
+    }
+
 
     /**
      * Runs the QRS detection algorithm on the given ECG value.
@@ -248,8 +328,8 @@ public class QRSDetection implements IConstants, IQRSConstants {
         // Plot
         // Multipliers on curSquare and curScore should be the same
         double scale_factor = 5;
-        qrsPlotter().addValues(ecg, scale_factor * curDeriv.getLast(),
-                scale_factor * curScore.getLast());
+        qrsPlotter().addValues(ecg, 0.0, 0.0); /*  scale_factor * curDeriv.getLast(),
+                                        scale_factor * curScore.getLast()); */
     }
 
     /**
@@ -302,6 +382,25 @@ public class QRSDetection implements IConstants, IQRSConstants {
 
     public HRPlotter hrPlotter() {
         return mActivity.mHRPlotter;
+    }
+
+
+    int which_max(ArrayList<Double> v) {
+        if(v.isEmpty()) return(-1);
+
+        int n = v.size();
+        if(n==1) return(0);
+
+        double max = v.get(0);
+        int max_index = 0;
+
+        for(int i=1; i<n; i++) {
+            if(v.get(i) > max) {
+                max_index = i;
+            }
+        }
+
+        return(max_index);
     }
 
 }
