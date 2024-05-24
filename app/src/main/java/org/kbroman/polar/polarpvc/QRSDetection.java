@@ -17,51 +17,10 @@ public class QRSDetection implements IConstants, IQRSConstants {
             new FixedSizeList<>(DATA_WINDOW);
 
     private int mPeakIndex = -1;
-    private int minPeakIndex = -1; // to store location of minimum
-    private int mMinPeakIndex = -1;
-    private int mMaxPeakIndex = -1;
 
-    // Initialize these with observed values
-    private static final double STAT_INITIAL_MEAN = .00;
-    private static final double STAT_INITIAL_STDDEV = .1;
-    private static final double N_SIGMA = 1.0;
-    private static final int SEARCH_EXTEND = 2;
-
-    double mSumVals = STAT_INITIAL_MEAN * HR_200_INTERVAL;
-    double mSumSq = (STAT_INITIAL_STDDEV * STAT_INITIAL_STDDEV -
-            STAT_INITIAL_MEAN * STAT_INITIAL_MEAN) * HR_200_INTERVAL;
-    int mNStat = HR_200_INTERVAL;
-    double mMean = STAT_INITIAL_MEAN;
-    double mStdDev = STAT_INITIAL_STDDEV;
-    double mThreshold = mMean + N_SIGMA * mStdDev;
-
-    private int mNSamples = 0;
     private double mStartTime = Double.NaN;
 
-    // These keep track of the lowest and highest ECG values in the scoring
-    // window. The max should correspond to R and the min to S. The normal
-    // duration (interval) of the QRS complex is between 0.08 and 0.10
-    // seconds When the duration is between 0.10 and 0.12 seconds, it is
-    // intermediate or slightly prolonged. A QRS duration of greater than
-    // 0.12 seconds is considered abnormal. 0.12 ms = 16 samples. 0.10
-    // samples = 13 samples.
-
-//    private final FixedSizeList<Double> curButterworth =
-//            new FixedSizeList<>(DATA_WINDOW);
-    private final FixedSizeList<Double> curDeriv =
-            new FixedSizeList<>(DATA_WINDOW);
-    private final FixedSizeList<Double> curScore =
-            new FixedSizeList<>(DATA_WINDOW);
-    private final FixedSizeList<Double> curEcg =
-            new FixedSizeList<>(DATA_WINDOW);
-
     private final List<Double> ecgVals = new ArrayList<>();
-
-    /**
-     * Moving average of the RR. Used to get the HR as 60 / avgRR.
-     */
-    private final RunningAverage movingAverageRr =
-            new RunningAverage(MOV_AVG_HR_WINDOW);
 
     private final RunningAveSD movingAveSDecg = new RunningAveSD(MOVING_AVESD_WINDOW);
 
@@ -72,14 +31,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
     public void process(PolarEcgData polarEcgData) {
         // Update the ECG plot
         ecgPlotter().addValues(polarEcgData);
-
-        /*
-        for (Integer val : polarEcgData.samples) {
-            movingAveSDecg.add((double) (MICRO_TO_MILLI_VOLT * val)); // keep running average and SD
-            // samples contains the ecgVals values in μV, mv = .001 * μV;
-            doAlgorithm(MICRO_TO_MILLI_VOLT * val);
-        }
-        */
 
         int start, end, n;
 
@@ -115,7 +66,7 @@ public class QRSDetection implements IConstants, IQRSConstants {
         // Record the start time as now.
         if (Double.isNaN(mStartTime)) mStartTime = new Date().getTime();
 
-        if(!smsqdiff.isEmpty()) smsqdiff.clear();
+        smsqdiff.clear();
         // get squared differences
         for(int i=start; i<end-1; i++) {
             double diff = (ecgVals.get(i) - ecgVals.get(i+1));
@@ -135,8 +86,6 @@ public class QRSDetection implements IConstants, IQRSConstants {
         int max_index = which_max(smsqdiff);
         double this_smsqdiff = smsqdiff.get(max_index);
         mPeakIndex = max_index + start;
-
-        Log.d(TAG, max_index + " " + start + " " + end + " " + ecgVals.size() + " " + mPeakIndex);
 
         double this_ecg = ecgVals.get(mPeakIndex);
 
@@ -158,219 +107,29 @@ public class QRSDetection implements IConstants, IQRSConstants {
                 }
             }
         }
-    }
 
+        // now look at whether penultimate peak was a PVC
+        if(peakFound && mPeakIndices.size() > INITIAL_PEAKS_TO_SKIP) {
+            int lastPeakIndex = mPeakIndices.get(mPeakIndices.size()-2);
+            int thisPeakIndex = mPeakIndices.get(mPeakIndices.size()-1);
 
-    /**
-     * Runs the QRS detection algorithm on the given ECG value.
-     *
-     * @param ecg The value to process.
-     */
-    public void doAlgorithm(double ecg) {
-        // Record the start time as now.
-        if (Double.isNaN(mStartTime)) mStartTime = new Date().getTime();
-        ecgVals.add(ecg);
-        mNSamples++;
-        curEcg.add(ecg);
+            ArrayList<Double> temp_ecg = new ArrayList<>();
 
-        FixedSizeList<Double> input;
-        double doubleVal, hr, rr;
-        double variance;
+            int endSearch = (int)Math.min((double)(thisPeakIndex - lastPeakIndex)/2.0, 20.0);
 
-        Boolean peakFound=false;
+            for(int i=1; i<endSearch; i++) temp_ecg.add( ecgVals.get(lastPeakIndex+i) );
+            int minPeakIndex = which_min(temp_ecg);
 
-//        // Butterworth
-//        input = curEcg;
-//        if (curButterworth.size() == DATA_WINDOW) curButterworth.remove(0);
-//        curButterworth.add(0.);    // Doesn't matter
-//        doubleVal = filter(A_BUTTERWORTH3, B_BUTTERWORTH3, input,
-//                curButterworth);
-//        curButterworth.set(curButterworth.size() - 1, doubleVal);
-
-        // Derivative (Only using positive part)
-        input = curEcg;
-        curDeriv.add(0.);    // Doesn't matter
-        doubleVal = filter(A_DERIVATIVE, B_DERIVATIVE, input,
-                curDeriv);
-        doubleVal = Math.max(doubleVal, 0);
-        curDeriv.set(curDeriv.size() - 1, doubleVal);
-
-        // Score
-        mNStat++;
-        mSumVals += doubleVal;
-        mSumSq += doubleVal * doubleVal;
-        mMean = mSumVals / mNStat;
-        variance = mSumSq / mNStat + mMean * mMean;
-        mStdDev = Math.sqrt(variance);
-        mThreshold = mMean + N_SIGMA * mStdDev;
-        curScore.add(mThreshold);
-
-        double val, maxEcg, lastMaxEcgVal, minEcg, lastMinEcgVal;
-        double scoreval;
-        int lastIndex, lastPeakIndex, startSearch, endSearch, thisPeakIndex;
-
-        input = curDeriv;
-        int i = mNSamples - 1;
-
-        // Process finding the peaks
-        if (i % HR_200_INTERVAL == 0) {
-            // End of interval, process this interval
-            if (i > 0 && mPeakIndex != -1) {
-                // There is an mPeakIndex != -1
-                // Look between mMinPeakIndex and mMaxPeakIndex for a the
-                // largest ecg value
-                startSearch = Math.max(i - HR_200_INTERVAL, mMinPeakIndex);
-                if (startSearch < 0) startSearch = 0;
-                endSearch = Math.min(i, mMaxPeakIndex + SEARCH_EXTEND);
-                maxEcg = -Double.MAX_VALUE;
-                for (int i1 = startSearch; i1 < endSearch + 1; i1++) {
-                    if (ecgVals.get(i1) > maxEcg) {
-                        maxEcg = ecgVals.get(i1);
-                        mPeakIndex = i1;
-                    }
-                } // End of search
-
-                // Check if there is a close one in the previous interval
-                if((maxEcg - movingAveSDecg.average())/movingAveSDecg.sd() >= MIN_PEAK_ECG_VALUE) { // if maxEcg is small, don't call it a peak
-
-                    if (mPeakIndices.size() > 0) {
-                        lastIndex = mPeakIndices.size() - 1; // last
-                        // index in mPeakIndices
-                        lastPeakIndex = mPeakIndices.get(lastIndex);
-                        if (mPeakIndex - lastPeakIndex < HR_200_INTERVAL) {
-                            lastMaxEcgVal = ecgVals.get(lastPeakIndex);
-                            if (maxEcg >= lastMaxEcgVal) {
-                                // Replace the old one
-                                mPeakIndices.setLast(mPeakIndex);
-                                qrsPlotter().replaceLastPeakValue(mPeakIndex, maxEcg);
-                            }
-                        } else {
-                            // Is not near a previous one, add it
-                            mPeakIndices.add(mPeakIndex);
-                            qrsPlotter().addPeakValue(mPeakIndex, maxEcg);
-
-                            peakFound=true;
-                        }
-
-                    } else {
-                        // First peak
-                        mPeakIndices.add(mPeakIndex);
-                        qrsPlotter().addPeakValue(mPeakIndex, maxEcg);
-
-                        peakFound=true;
-                    }
-                } else {
-                    Log.d(TAG, "low peak: " + Math.round((maxEcg - movingAveSDecg.average()) / movingAveSDecg.sd()*100)/100.0);
-                }
-
-
-                if(peakFound && mPeakIndices.size() > INITIAL_PEAKS_TO_SKIP) {
-                    lastPeakIndex = mPeakIndices.get(mPeakIndices.size()-2);
-                    thisPeakIndex = mPeakIndices.get(mPeakIndices.size()-1);
-
-                    minEcg = Double.MAX_VALUE;
-                    minPeakIndex = -1;
-                    endSearch = (int)Math.min((double)(thisPeakIndex - lastPeakIndex)/2.0, 20.0);
-
-                    for (int i1 = 3; i1 < endSearch; i1++) {
-                        if (ecgVals.get(lastPeakIndex + i1) < minEcg) {
-                            minEcg = ecgVals.get(lastPeakIndex + i1);
-                            minPeakIndex = i1;
-                        }
-                    }
-
-                    if(minPeakIndex >= PVC_RS_DIST) { // looks like a PVC
-                        qrsPlotter().addPVCValue(lastPeakIndex, ecgVals.get(lastPeakIndex));
-                        mActivity.PVCdata.add(1.0);
-                    } else {                          // not a PVC
-                        mActivity.PVCdata.add(0.0);
-                    }
-                }
-
-
-                // Do HR/RR plot
-                if (mPeakIndices.size() > 1) {
-                    rr = 1000 / FS * (mPeakIndex - mPeakIndices.get(mPeakIndices.size() - 2));
-                    hr = 60000. / rr;
-                    if (!Double.isInfinite(hr)) {
-//                    movingAverageHr.add(hr);
-                        movingAverageRr.add(rr);
-                        // Wait to start plotting until HR average is well
-                        // defined
-                        if (movingAverageRr.size() >= MOV_AVG_HR_WINDOW) {
-//                        hrPlotter().addValues2(mStartTime + 1000 *
-//                        mMaxIndex / FS,
-//                                movingAverageHr.average(), rr);
-                            hrPlotter().addValues2(mStartTime + 1000 * mPeakIndex / FS,
-                                    60000. / movingAverageRr.average(), rr);
-                            hrPlotter().fullUpdate();
-                        }
-                    }
-                }
-            }
-            // Start a new interval
-            mPeakIndex = -1;
-            mMinPeakIndex = -1;
-            mMaxPeakIndex = -1;
-        } // End of end of process interval
-
-        // Check for max ecg
-        val = input.getLast();
-        scoreval = curScore.getLast();
-        if (val > scoreval) {
-            mPeakIndex = i;
-            if (mPeakIndex > mMaxPeakIndex)
-                mMaxPeakIndex = mPeakIndex;
-            if (mMinPeakIndex == -1 || mPeakIndex < mMinPeakIndex)
-                mMinPeakIndex = mPeakIndex;
-        }
-
-        // Plot
-        // Multipliers on curSquare and curScore should be the same
-        double scale_factor = 5;
-        qrsPlotter().addValues(ecg, 0.0, 0.0); /*  scale_factor * curDeriv.getLast(),
-                                        scale_factor * curScore.getLast()); */
-    }
-
-    /**
-     * Calculates a result for a generalized filter with coefficients a and b.
-     * Returns 0 if x and y are not long enough to provide sufficient values
-     * for the sums over the coefficients.
-     * <p>
-     * y[n] = 1 / a[0] * (suma - sumb)
-     * suma = sum from 1 to q of a[j] * y[n-j], q = len(a)
-     * sumb = sum from 0 to p of b[j] * x[n-j], p = len(b)
-     * Uses the values at the ends of x and y.
-     *
-     * @param a The A filter coefficients.
-     * @param b The B filter coefficients.
-     * @param x x values for the filter.
-     * @param y y values for the filter.
-     * @return The new value.
-     */
-    public double filter(double[] a, double[] b, List<Double> x,
-                         List<Double> y) {
-        // TODO Consider handling lenx < lenb and leny < lena differently
-        //  than exit
-        int lena = a.length;
-        int lenb = b.length;
-        int lenx = x.size();
-        int leny;
-        if (lenx < lenb) return (0);
-        double suma = 0;
-        if (y != null) {
-            leny = y.size();
-            if (leny < lena) return (0);
-            for (int i = 0; i < lena; i++) {
-                suma += a[i] * y.get(leny - i - 1);
+            if(minPeakIndex >= PVC_RS_DIST) { // looks like a PVC
+                qrsPlotter().addPVCValue(lastPeakIndex, ecgVals.get(lastPeakIndex));
+                mActivity.PVCdata.add(1.0);
+            } else {                          // not a PVC
+                mActivity.PVCdata.add(0.0);
             }
         }
-        double sumb = 0;
-        for (int i = 0; i < lenb; i++) {
-            sumb += b[i] * x.get(lenx - i - 1);
-        }
-        return (sumb - suma) / a[0];
+
     }
+
 
     public ECGPlotter ecgPlotter() {
         return mActivity.mECGPlotter;
@@ -397,10 +156,30 @@ public class QRSDetection implements IConstants, IQRSConstants {
         for(int i=1; i<n; i++) {
             if(v.get(i) > max) {
                 max_index = i;
+                max = v.get(i);
             }
         }
 
         return(max_index);
+    }
+
+    int which_min(ArrayList<Double> v) {
+        if(v.isEmpty()) return(-1);
+
+        int n = v.size();
+        if(n==1) return(0);
+
+        double min = v.get(0);
+        int min_index = 0;
+
+        for(int i=1; i<n; i++) {
+            if(v.get(i) < min) {
+                min_index = i;
+                min = v.get(i);
+            }
+        }
+
+        return(min_index);
     }
 
 }
