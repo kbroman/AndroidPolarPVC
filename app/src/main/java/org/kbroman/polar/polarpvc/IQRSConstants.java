@@ -108,12 +108,12 @@ interface IQRSConstants {
     double[] B_DERIVATIVE = {25, -48, 36, -16, 3};
 
 
-    /**
-     * minimum Ecg value for a peak (don't call a peak if it's below this)
+     * minimum value for a peak (don't call a peak if it's below this)
      * this is in terms of number of SDs above the mean,
-     * where mean and sd are from running window
+     * where mean and sd are from running window,
+     * and after taking smoothed squared differences
      */
-    double MIN_PEAK_ECG_VALUE = 0.5;
+    double MIN_PEAK_VALUE = 1.5;
     /**
      * size of window for the running mean and sd
      */

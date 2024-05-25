@@ -91,7 +91,7 @@ public class QRSDetection implements IConstants, IQRSConstants {
 
         Boolean peakFound=false;
 
-        if((this_smsqdiff - movingAveSDecg.average())/movingAveSDecg.sd() >= MIN_PEAK_ECG_VALUE) { // peak only if large
+        if((this_smsqdiff - movingAveSDecg.average())/movingAveSDecg.sd() >= MIN_PEAK_VALUE) { // peak only if large
             if(mPeakIndices.size() == 0 || mPeakIndex - lastPeak >= HR_200_INTERVAL) { // new peak
                 peakFound = true;
                 last_smsqdiff = this_smsqdiff;
