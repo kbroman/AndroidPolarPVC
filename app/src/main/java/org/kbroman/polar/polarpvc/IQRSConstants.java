@@ -37,35 +37,7 @@ interface IQRSConstants {
      * coefficients.
      */
     int DATA_WINDOW = 20;
-    /**
-     * Moving average data window size.
-     */
-    int MOV_AVG_WINDOW = 20;
-    /**
-     * Moving average HR window size.
-     */
-    int MOV_AVG_HR_WINDOW = 25;
-    /**
-     * Moving average height window size.
-     */
-    int MOV_AVG_HEIGHT_WINDOW = 5;
-    /**
-     * Moving average height default.
-     */
-    double MOV_AVG_HEIGHT_DEFAULT = .025;
-    /**
-     * Moving average height threshold factor.
-     * Note: threshold = MOV_AVG_HEIGHT_THRESHOLD_FACTOR * Moving_average.avg()
-     */
-    double MOV_AVG_HEIGHT_THRESHOLD_FACTOR = .4;
-    /**
-     * The maximum number of samples between R and S. The normal
-     * duration (interval) of the QRS complex is between 0.08 and 0.10
-     * seconds When the duration is between 0.10 and 0.12 seconds, it is
-     * intermediate or slightly prolonged. A QRS duration of greater than
-     * 0.12 seconds is considered abnormal.
-     */
-    int MAX_QRS_LENGTH = (int)Math.round(.12 * FS); // 13
+
     /***
      * The heart rate interval. The algorithm is based on there being only one
      * heart beat in this interval. Assumes maximum heart rate is 200.
@@ -75,11 +47,6 @@ interface IQRSConstants {
      * How many seconds the domain interval is for the HRPlotter.
      */
     long HR_PLOT_DOMAIN_INTERVAL = 1 * 60000;  // 1 min
-    /**
-     * Number of standard deviations above mean to use to threshold.
-     */
-    int NUMBER_OF_STDDEV = 2;
-
 
     /**
      * Convert μV to mV.
@@ -87,27 +54,6 @@ interface IQRSConstants {
     double MICRO_TO_MILLI_VOLT = .001;
 
     /**
-     * Convert millisecond to seconds.
-     */
-    double MS_TO_SEC = .001;
-
-    /**
-     * Filter coefficients for Butterworth fs=130 low_cutoff=5 high_cutoff=20
-     */
-    double[] A_BUTTERWORTH3 = {1.0, -4.026234474291334,
-            7.118704187414651,
-            -7.142612123715484, 4.314550872956459,
-            -1.4837877480823038, 0.2259301306922936,};
-    double[] B_BUTTERWORTH3 = {0.025966345753506013, 0.0,
-            -0.07789903726051804,
-            0.0, 0.07789903726051804, 0.0, -0.025966345753506013,};
-    /**
-     * Filter coefficients for Pan Tompkins derivative
-     */
-    double[] A_DERIVATIVE = {12};
-    double[] B_DERIVATIVE = {25, -48, 36, -16, 3};
-
-
      * minimum value for a peak (don't call a peak if it's below this)
      * this is in terms of number of SDs above the mean,
      * where mean and sd are from running window,
