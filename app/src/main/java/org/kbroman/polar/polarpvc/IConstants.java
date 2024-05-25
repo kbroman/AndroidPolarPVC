@@ -43,6 +43,15 @@ public interface IConstants {
     /* number of peaks to use in estimating percent PVC */
     int NUM_PEAKS_FOR_PVC_AVE = 100;
 
+    /* number of peaks to use in estimating average RR */
+    int NUM_PEAKS_FOR_RR_AVE = 100;
+
+    /**
+     * factor for converting average RR (as indices) to HR
+     *    this / average RR = estimated HR
+     */
+    double RR_TO_HR_FACTOR = 1.0e9 / 7682304.0 * 60;
+
     /* Time Zone */
     String TIME_ZONE = "America/Chicago";
 

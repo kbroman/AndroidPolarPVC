@@ -5,7 +5,7 @@ interface IQRSConstants {
      * Sampling rate. These algorithms are based on this particular sampling
      * rate.
      */
-    double FS = 130.0;
+    double FS = 130.169282548569;
     /**
      * Number of small boxes in a large box.
      */
@@ -73,6 +73,6 @@ interface IQRSConstants {
     /**
      * number of peaks to skip before starting to call PVCs
      */
-    int INITIAL_PEAKS_TO_SKIP = 5;
+    int INITIAL_PEAKS_TO_SKIP = 2;
 
 }

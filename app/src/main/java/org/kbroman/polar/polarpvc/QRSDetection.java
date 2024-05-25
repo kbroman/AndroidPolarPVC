@@ -126,6 +126,9 @@ public class QRSDetection implements IConstants, IQRSConstants {
             } else {                          // not a PVC
                 mActivity.PVCdata.add(0.0);
             }
+
+            // get RR distance assuming
+            mActivity.RRdata.add((mPeakIndices.get(mPeakIndices.size()-2) - mPeakIndices.get(mPeakIndices.size()-3)));
         }
 
     }

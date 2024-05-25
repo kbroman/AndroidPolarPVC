@@ -92,6 +92,7 @@ public class ECGActivity extends AppCompatActivity
     public QRSPlotter mQRSPlotter;
 
     public RunningAverage PVCdata = new RunningAverage(NUM_PEAKS_FOR_PVC_AVE);
+    public RunningAverage RRdata = new RunningAverage(NUM_PEAKS_FOR_RR_AVE);
 
     public boolean mOrientationChangedECG = false;
     public boolean mOrientationChangedQRS = false;
@@ -111,7 +112,7 @@ public class ECGActivity extends AppCompatActivity
      */
     private enum SaveType {DATA, PLOT, BOTH, DEVICE_HR, QRS_HR, ALL}
 
-    TextView mTextViewHR, mTextViewInfo, mTextViewTime, mTextViewPVC;
+    TextView mTextViewHR, mTextViewInfo, mTextViewTime, mTextViewPVC, mTextViewHR2;
     private PolarBleApi mApi;
     private Disposable mEcgDisposable;
     private boolean mPlaying;
@@ -248,6 +249,7 @@ public class ECGActivity extends AppCompatActivity
         setContentView(R.layout.activity_ecg);
         mTextViewHR = findViewById(R.id.hr);
         mTextViewPVC = findViewById(R.id.pvc);
+        mTextViewHR2 = findViewById(R.id.hr2);
         mTextViewInfo = findViewById(R.id.info);
         mTextViewTime = findViewById(R.id.time);
         mECGPlot = findViewById(R.id.ecgplot);
@@ -1428,6 +1430,7 @@ public class ECGActivity extends AppCompatActivity
 
         TextView hrOld = mTextViewHR;
         TextView pvcOld = mTextViewPVC;
+        TextView hr2Old = mTextViewHR2;
         TextView timeOld = mTextViewTime;
         TextView infoOld = mTextViewInfo;
 
@@ -1445,6 +1448,7 @@ public class ECGActivity extends AppCompatActivity
         mHRPlot = findViewById(R.id.hrplot);
         mTextViewHR = findViewById(R.id.hr);
         mTextViewPVC = findViewById(R.id.pvc);
+        mTextViewHR2 = findViewById(R.id.hr2);
         mTextViewTime = findViewById(R.id.time);
         mTextViewInfo = findViewById(R.id.info);
 
@@ -1453,6 +1457,7 @@ public class ECGActivity extends AppCompatActivity
         mECGPlot.post(() -> {
             mTextViewHR.setText(hrOld.getText());
             mTextViewPVC.setText(pvcOld.getText());
+            mTextViewHR2.setText(hr2Old.getText());
             mTextViewTime.setText(timeOld.getText());
             mTextViewInfo.setText(infoOld.getText());
 
@@ -1504,6 +1509,7 @@ public class ECGActivity extends AppCompatActivity
         if (mHRPlotter != null) mHRPlotter.clear();
         mTextViewHR.setText("");
         mTextViewPVC.setText("");
+        mTextViewHR2.setText("");
         mTextViewTime.setText("");
         mTextViewInfo.setText("");
         invalidateOptionsMenu();
@@ -1611,7 +1617,11 @@ public class ECGActivity extends AppCompatActivity
                                                @NonNull PolarHrData polarHrData) {
                 if (mPlaying) {
                     mTextViewHR.setText(String.valueOf(polarHrData.hr) + " bpm");
-                    mTextViewPVC.setText(String.valueOf(Math.round(PVCdata.average()*100.0)) + "% pvc"); // put PVC value here
+                    mTextViewPVC.setText(String.valueOf(Math.round(PVCdata.average()*100.0)) + "% pvc");
+                    if(RRdata.size() > 0) {
+                        mTextViewHR2.setText(String.valueOf(Math.round(RR_TO_HR_FACTOR / RRdata.average())));
+                    }
+
                     // Add to HR plot
                     long time = new Date().getTime();
                     mHRPlotter.addValues1(time, polarHrData.hr,
