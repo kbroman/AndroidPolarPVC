@@ -44,7 +44,7 @@ public interface IConstants {
     int NUM_PEAKS_FOR_PVC_AVE = 100;
 
     /* number of peaks to use in estimating average RR */
-    int NUM_PEAKS_FOR_RR_AVE = 100;
+    int NUM_PEAKS_FOR_RR_AVE = 25;
 
     /**
      * factor for converting average RR (as indices) to HR
