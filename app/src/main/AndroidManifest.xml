@@ -33,7 +33,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name="org.kbroman.polar.polarpvc.ECGActivity"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="fullUser"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true">
             <intent-filter>
