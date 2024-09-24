@@ -15,7 +15,7 @@ you need to know the ID of your device (which is printed on its side).
 You can see the ECG trace in real time and save PNG and CSV files of
 the data.
 
-It uses the [Polar SDK](https://github.com/polarofficial/polar-ble-sdk and
+It uses the [Polar SDK](https://github.com/polarofficial/polar-ble-sdk) and
 [Android Plot](https://github.com/halfhp/androidplot).
 
 **More information**
